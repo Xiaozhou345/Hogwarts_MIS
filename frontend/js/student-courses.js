@@ -338,7 +338,7 @@ async function loadMySchedule() {
           if (course && activity) {
             const colorStyle = getCourseColorStyle(course.course_id, course.course_name);
             html += `
-              <td class="course-cell split-cell">
+              <td class="course-cell split-cell" data-enrollment-id="${activity.enrollment_id}">
                 <div class="split-cell-container">
                   <div class="split-cell-top" style="background: ${colorStyle.bg}; border-left: 3px solid ${colorStyle.border};">
                     <div class="split-course-name">📚 ${course.course_name}</div>
@@ -348,6 +348,7 @@ async function loadMySchedule() {
                   <div class="split-cell-bottom" style="background: rgba(212, 175, 55, 0.2); border-left: 3px solid var(--hogwarts-gold);">
                     <div class="split-activity-name">✨ ${activity.activity_name_cn}</div>
                     <div class="split-detail">时间转换器</div>
+                    <button class="activity-delete-btn" data-enrollment-id="${activity.enrollment_id}" title="取消该活动">×</button>
                   </div>
                 </div>
               </td>
@@ -412,6 +413,15 @@ async function loadMySchedule() {
       
       // 触发课程表加载完成事件
       window.dispatchEvent(new CustomEvent('scheduleLoaded'));
+      
+      // 绑定活动删除按钮事件
+      container.querySelectorAll('.activity-delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const enrollmentId = parseInt(btn.dataset.enrollmentId);
+          await handleDeleteActivity(enrollmentId);
+        });
+      });
     } else if (res.code === 200) {
       container.innerHTML = '<p class="no-data">还没有选课，暂无课程表<br><small>请先到"可选课程"中选课</small></p>';
     } else {
@@ -479,6 +489,25 @@ async function handleLogout() {
     localStorage.removeItem('user_id');
     localStorage.removeItem('username');
     localStorage.removeItem('house_id');
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
+  }
+}
+
+async function handleDeleteActivity(enrollmentId) {
+  const confirmed = await UIConfirm.confirm('确定要取消该活动吗？', '取消后将无法恢复');
+  if (!confirmed) return;
+  
+  try {
+    const res = await cancelActivityEnrollment(enrollmentId);
+    
+    if (res.code === 200) {
+      UIToast.success(res.msg || '活动已取消');
+      await loadMySchedule();
+    } else {
+      UIToast.error(res.msg || '取消失败');
+    }
+  } catch (err) {
+    console.error('取消活动失败:', err);
+    UIToast.error('网络错误');
   }
 }

@@ -343,7 +343,7 @@ def get_my_schedule():
 
         # 2. 获取活动安排（时间转换器活动）
         activity_sql = """
-            SELECT a.activity_name, a.activity_name_cn, sae.weekday,
+            SELECT sae.enrollment_id, a.activity_name, a.activity_name_cn, sae.weekday,
                    sae.start_time, sae.end_time, a.location
             FROM student_activity_enrollment sae
             JOIN activity a ON sae.activity_id = a.activity_id
@@ -411,6 +411,7 @@ def get_my_schedule():
 
             week_schedule[day].append({
                 "type": "activity",
+                "enrollment_id": a['enrollment_id'],
                 "activity_name": a['activity_name'],
                 "activity_name_cn": a['activity_name_cn'],
                 "start_time": start,
