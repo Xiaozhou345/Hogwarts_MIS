@@ -1,0 +1,17 @@
+#Python编译缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+#虚拟环境
+.venv/
+venv/
+ENV/
+env/
+
+#环境变量配置(绝对不能提交!)
+.env
+
+#操作系统产生的隐藏文件
+.DS_Store
+Thumbs.db

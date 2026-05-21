@@ -1,0 +1,11 @@
+#Web框架(Flask)
+Flask==3.0.3
+
+#MySQL数据库连接驱动
+PyMySQL==1.1.0
+
+#环境变量读取工具
+python-dotenv==1.0.1
+
+#跨域请求处理(前后端分离必备)
+Flask-CORS==4.0.0
