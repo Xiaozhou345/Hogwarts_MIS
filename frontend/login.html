@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 霍格沃茨学院积分系统</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card fade-in">
+      <h1 class="auth-title">霍格沃茨</h1>
+      <p class="auth-subtitle">学院积分系统</p>
+      <div class="magic-divider"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" id="username" class="form-input" placeholder="请输入用户名" required>
+          <p id="usernameError" class="error-message"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+          <p id="passwordError" class="error-message"></p>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="magic-btn" id="submitBtn">
+            <span id="btnText">登录</span>
+          </button>
+        </div>
+
+        <p id="errorMsg" class="error-message" style="text-align: center;"></p>
+      </form>
+
+      <div class="auth-footer">
+        还没有账号？<a href="register.html" class="auth-link">立即注册</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+-- 学院表
 CREATE TABLE house(
     house_id INT AUTO_INCREMENT PRIMARY KEY,
     house_name VARCHAR(50) NOT NULL UNIQUE,
@@ -5,13 +6,14 @@ CREATE TABLE house(
     total_points INT DEFAULT 0 COMMENT '学院总分，由触发器自动维护'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 初始化基础数据
+-- 初始化学院数据
 INSERT INTO house(house_name,founder,total_points) VALUES
 ('Gryffindor','Godric Gryffindor',0),
 ('Slytherin','Salazar Slytherin',0),
 ('Ravenclaw','Rowena Ravenclaw',0),
 ('Hufflepuff','Helga Hufflepuff',0);
 
+-- 用户表（学生+教授）
 CREATE TABLE sys_user(
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -22,6 +24,7 @@ CREATE TABLE sys_user(
     CONSTRAINT fk_user_house FOREIGN KEY(house_id) REFERENCES house(house_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 分数记录表
 CREATE TABLE point_log(
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL COMMENT '外键：被加扣分的学生',
@@ -33,26 +36,19 @@ CREATE TABLE point_log(
     CONSTRAINT fk_log_professor FOREIGN KEY(professor_id) REFERENCES sys_user(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 触发器：加分扣分后自动更新学院总分
 DELIMITER //
-
 CREATE TRIGGER trg_after_point_insert
 AFTER INSERT ON point_log
 FOR EACH ROW
 BEGIN
-    -- 声明变量存储学生所在的学院ID
     DECLARE target_house_id INT;
+    SELECT house_id INTO target_house_id FROM sys_user WHERE user_id = NEW.student_id;
     
-    -- 获取被加扣分学生所在的学院
-    SELECT house_id INTO target_house_id 
-    FROM sys_user 
-    WHERE user_id=NEW.student_id;
-    
-    -- 自动更新该学院的总分
     IF target_house_id IS NOT NULL THEN
         UPDATE house 
-        SET total_points=total_points+NEW.score_change 
-        WHERE house_id=target_house_id;
+        SET total_points = total_points + NEW.score_change 
+        WHERE house_id = target_house_id;
     END IF;
 END //
-
 DELIMITER ;

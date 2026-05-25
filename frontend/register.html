@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册 - 霍格沃茨学院积分系统</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card fade-in">
+      <h1 class="auth-title">霍格沃茨</h1>
+      <p class="auth-subtitle">新巫师注册</p>
+      <div class="magic-divider"></div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" id="username" class="form-input" placeholder="请输入用户名" required>
+          <p id="usernameError" class="error-message"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+          <p id="passwordError" class="error-message"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">确认密码</label>
+          <input type="password" id="confirmPassword" class="form-input" placeholder="请再次输入密码" required>
+          <p id="confirmPasswordError" class="error-message"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">角色</label>
+          <select id="role" class="form-select" required>
+            <option value="">请选择角色</option>
+            <option value="0">学生</option>
+            <option value="1">教授</option>
+          </select>
+          <p id="roleError" class="error-message"></p>
+        </div>
+
+        <div id="houseGroup" class="form-group fade-in" style="display: none;">
+          <label class="form-label">所属学院</label>
+          <select id="house_id" class="form-select">
+            <option value="">请选择学院</option>
+            <option value="1">格兰芬多</option>
+            <option value="2">斯莱特林</option>
+            <option value="3">拉文克劳</option>
+            <option value="4">赫奇帕奇</option>
+          </select>
+          <p id="houseError" class="error-message"></p>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="magic-btn" id="submitBtn">
+            <span id="btnText">注册</span>
+          </button>
+        </div>
+
+        <p id="successMsg" class="success-message"></p>
+        <p id="errorMsg" class="error-message" style="text-align: center;"></p>
+      </form>
+
+      <div class="auth-footer">
+        已有账号？<a href="login.html" class="auth-link">立即登录</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>
