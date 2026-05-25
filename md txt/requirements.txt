@@ -9,3 +9,9 @@ python-dotenv==1.0.1
 
 #跨域请求处理(前后端分离必备)
 Flask-CORS==4.0.0
+
+#JWT认证
+PyJWT==2.8.0
+
+#HTTP请求库(用于测试)
+requests==2.31.0
