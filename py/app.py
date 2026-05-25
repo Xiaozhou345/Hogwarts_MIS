@@ -1,33 +1,131 @@
-import os
-import pymysql
-from flask import Flask,request,jsonify
-from dotenv import load_dotenv
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from config import Config
+from db_utils import execute_query
+from auth_utils import hash_password, verify_password, generate_token, token_required
 
-#加载环境变量
-load_dotenv()
+app = Flask(__name__)
+CORS(app)
 
-app=Flask(__name__)
-
-#获取数据库配置
-DB_HOST=os.getenv("DB_HOST")
-DB_PORT=int(os.getenv("DB_PORT",3306))
-DB_USER=os.getenv("DB_USER")
-DB_PASSWORD=os.getenv("DB_PASSWORD")
-#假设你在MySQL中创建的数据库名为mis
-DB_NAME="mis"
-
-#测试数据库连接
-@app.route('/api/test_db',methods=['GET'])
+@app.route('/api/test_db', methods=['GET'])
 def test_db():
+    """测试数据库连接"""
     try:
-        conn=pymysql.connect(host=DB_HOST,port=DB_PORT,user=DB_USER,password=DB_PASSWORD,database=DB_NAME)
-        cursor=conn.cursor()
-        cursor.execute("SELECT VERSION();")
-        db_version=cursor.fetchone()
-        conn.close()
-        return jsonify({"code":200,"msg":"数据库连接成功!","data":db_version})
+        result = execute_query("SELECT VERSION();", fetch_one=True)
+        return jsonify({"code": 200, "msg": "数据库连接成功!", "data": result})
     except Exception as e:
-        return jsonify({"code":500,"msg":str(e),"data":None})
+        return jsonify({"code": 500, "msg": str(e), "data": None})
 
-if __name__=='__main__':
-    app.run(debug=True,port=5000)
+@app.route('/api/register', methods=['POST'])
+def register():
+    """用户注册"""
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        role = data.get('role')
+        house_id = data.get('house_id')
+
+        if not username or not password or role is None:
+            return jsonify({"code": 400, "msg": "缺少必要参数", "data": None}), 400
+
+        if role == 0 and not house_id:
+            return jsonify({"code": 400, "msg": "学生必须选择学院", "data": None}), 400
+
+        if role == 1:
+            house_id = None
+
+        existing_user = execute_query(
+            "SELECT user_id FROM sys_user WHERE username = %s",
+            (username,),
+            fetch_one=True
+        )
+
+        if existing_user:
+            return jsonify({"code": 400, "msg": "用户名已存在", "data": None}), 400
+
+        password_hash = hash_password(password)
+
+        execute_query(
+            "INSERT INTO sys_user (username, password_hash, role, house_id) VALUES (%s, %s, %s, %s)",
+            (username, password_hash, role, house_id),
+            commit=True
+        )
+
+        return jsonify({"code": 200, "msg": "注册成功", "data": None})
+
+    except Exception as e:
+        return jsonify({"code": 500, "msg": f"服务器错误: {str(e)}", "data": None}), 500
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """用户登录"""
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({"code": 400, "msg": "缺少用户名或密码", "data": None}), 400
+
+        user = execute_query(
+            "SELECT user_id, password_hash, role FROM sys_user WHERE username = %s",
+            (username,),
+            fetch_one=True
+        )
+
+        if not user:
+            return jsonify({"code": 400, "msg": "用户名或密码错误", "data": None}), 400
+
+        if not verify_password(password, user['password_hash']):
+            return jsonify({"code": 400, "msg": "用户名或密码错误", "data": None}), 400
+
+        token = generate_token(user['user_id'], user['role'])
+
+        return jsonify({
+            "code": 200,
+            "msg": "登录成功",
+            "data": {
+                "token": token,
+                "role": user['role'],
+                "user_id": user['user_id']
+            }
+        })
+
+    except Exception as e:
+        return jsonify({"code": 500, "msg": f"服务器错误: {str(e)}", "data": None}), 500
+
+@app.route('/api/logout', methods=['POST'])
+@token_required
+def logout():
+    """用户登出"""
+    return jsonify({"code": 200, "msg": "已安全退出", "data": None})
+
+if __name__ == '__main__':
+    if Config.TEST_MODE:
+        print("\n" + "="*50)
+        print("🧪 测试模式已启动")
+        print("="*50 + "\n")
+        import sys
+        import os
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from test.stage1_test import run_stage1_tests
+
+        import threading
+        def run_flask():
+            app.run(debug=False, port=Config.PORT, use_reloader=False)
+
+        flask_thread = threading.Thread(target=run_flask, daemon=True)
+        flask_thread.start()
+
+        import time
+        time.sleep(2)
+
+        run_stage1_tests()
+    else:
+        print("\n" + "="*50)
+        print("🚀 霍格沃茨 MIS 系统启动")
+        print(f"📍 运行地址: http://127.0.0.1:{Config.PORT}")
+        print(f"🔧 调试模式: {'开启' if Config.DEBUG else '关闭'}")
+        print("="*50 + "\n")
+        app.run(debug=Config.DEBUG, port=Config.PORT)
