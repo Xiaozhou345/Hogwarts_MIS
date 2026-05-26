@@ -1,0 +1,259 @@
+:root {
+  --hogwarts-bg: #1a1a2e;
+  --hogwarts-bg-dark: #0f0f1a;
+  --hogwarts-text: #e8e8e8;
+  --hogwarts-text-muted: #a0a0a0;
+  --hogwarts-border: #2d2d4a;
+  --hogwarts-gold: #d4af37;
+  --hogwarts-gold-light: #f4d03f;
+  
+  --gryffindor-primary: #740001;
+  --gryffindor-secondary: #D3A625;
+  
+  --slytherin-primary: #1A472A;
+  --slytherin-secondary: #AAAAAA;
+  
+  --ravenclaw-primary: #0E1A40;
+  --ravenclaw-secondary: #B08A68;
+  
+  --hufflepuff-primary: #372E29;
+  --hufflepuff-secondary: #FFDB00;
+  
+  --success-color: #67c23a;
+  --error-color: #f56c6c;
+  --warning-color: #e6a23c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  background: var(--hogwarts-bg);
+  color: var(--hogwarts-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: 
+    radial-gradient(ellipse at top, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(116, 0, 1, 0.05) 0%, transparent 50%),
+    var(--hogwarts-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.03) 0%, transparent 20%),
+    radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.03) 0%, transparent 20%),
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.02) 0%, transparent 30%);
+  pointer-events: none;
+}
+
+.auth-card {
+  background: linear-gradient(145deg, rgba(26, 26, 46, 0.95) 0%, rgba(15, 15, 26, 0.98) 100%);
+  border: 2px solid var(--hogwarts-border);
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 420px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(212, 175, 55, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--hogwarts-gold) 0%, transparent 50%, var(--hogwarts-gold) 100%);
+  opacity: 0.3;
+  z-index: -1;
+}
+
+.auth-title {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--hogwarts-gold);
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.auth-subtitle {
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 14px;
+  color: var(--hogwarts-text-muted);
+  letter-spacing: 1px;
+}
+
+.magic-divider {
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--hogwarts-gold) 20%, 
+    var(--hogwarts-gold-light) 50%, 
+    var(--hogwarts-gold) 80%, 
+    transparent 100%);
+  margin: 0 auto 32px;
+  width: 60%;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--hogwarts-text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(15, 15, 26, 0.8);
+  border: 1px solid var(--hogwarts-border);
+  border-radius: 8px;
+  color: var(--hogwarts-text);
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--hogwarts-gold);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+.form-input::placeholder {
+  color: rgba(160, 160, 160, 0.5);
+}
+
+.form-select option {
+  background: var(--hogwarts-bg-dark);
+  color: var(--hogwarts-text);
+}
+
+.magic-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--hogwarts-gold) 0%, #c4a030 100%);
+  border: none;
+  border-radius: 8px;
+  color: #1a1a2e;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.magic-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, var(--hogwarts-gold-light) 0%, var(--hogwarts-gold) 100%);
+}
+
+.magic-btn:active {
+  transform: translateY(0);
+}
+
+.magic-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--hogwarts-text-muted);
+}
+
+.auth-link {
+  color: var(--hogwarts-gold);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.auth-link:hover {
+  color: var(--hogwarts-gold-light);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 12px;
+  margin-top: 6px;
+  min-height: 18px;
+}
+
+.success-message {
+  color: var(--success-color);
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(103, 194, 58, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(103, 194, 58, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, 
+    var(--hogwarts-gold) 0%, 
+    var(--hogwarts-gold-light) 50%, 
+    var(--hogwarts-gold) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

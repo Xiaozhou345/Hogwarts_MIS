@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>霍格沃茨学院积分系统</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+  <style>
+    .welcome-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: 
+        radial-gradient(ellipse at top, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom, rgba(116, 0, 1, 0.05) 0%, transparent 50%),
+        var(--hogwarts-bg);
+      padding: 40px;
+      text-align: center;
+    }
+
+    .welcome-title {
+      font-size: 48px;
+      color: var(--hogwarts-gold);
+      margin-bottom: 20px;
+      letter-spacing: 3px;
+      text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+    }
+
+    .welcome-subtitle {
+      font-size: 24px;
+      color: var(--hogwarts-text);
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+    }
+
+    .welcome-divider {
+      height: 3px;
+      width: 400px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--hogwarts-gold) 20%, 
+        var(--hogwarts-gold-light) 50%, 
+        var(--hogwarts-gold) 80%, 
+        transparent 100%);
+      margin-bottom: 40px;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .welcome-user {
+      font-size: 18px;
+      color: var(--hogwarts-text-muted);
+      margin-bottom: 30px;
+    }
+
+    .welcome-user span {
+      color: var(--hogwarts-gold);
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      padding: 12px 32px;
+      background: transparent;
+      border: 2px solid var(--hogwarts-gold);
+      border-radius: 8px;
+      color: var(--hogwarts-gold);
+      font-size: 16px;
+      font-family: inherit;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .logout-btn:hover {
+      background: var(--hogwarts-gold);
+      color: var(--hogwarts-bg);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    .magic-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--hogwarts-gold);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 6s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0.3;
+      }
+      50% {
+        transform: translateY(-100px) translateX(50px);
+        opacity: 0.1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="magic-particles" id="particles"></div>
+  
+  <div class="welcome-container">
+    <h1 class="welcome-title">Welcome to Hogwarts</h1>
+    <p class="welcome-subtitle">School of Witchcraft and Wizardry</p>
+    <div class="welcome-divider"></div>
+    <p class="welcome-user">欢迎，<span id="username">巫师</span></p>
+    <button class="logout-btn" onclick="logout()">退出登录</button>
+  </div>
+
+  <script>
+    const username = localStorage.getItem('username') || '巫师';
+    document.getElementById('username').textContent = username;
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('username');
+      localStorage.removeItem('user_id');
+      window.location.href = 'login.html';
+    }
+
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 6 + 's';
+      particlesContainer.appendChild(particle);
+    }
+  </script>
+</body>
+</html>
