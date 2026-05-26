@@ -1,11 +1,17 @@
+import sys
+import os
+os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from config import Config
 from db_utils import execute_query
 from auth_utils import hash_password, verify_password, generate_token, token_required
+from professor_api import professor_bp
 
 app = Flask(__name__)
 CORS(app)
+app.register_blueprint(professor_bp)
 
 @app.route('/api/test_db', methods=['GET'])
 def test_db():
@@ -102,14 +108,14 @@ def logout():
     return jsonify({"code": 200, "msg": "已安全退出", "data": None})
 
 if __name__ == '__main__':
+    # 测试模块，从测试调度代码文件调用测试，在env中配置开关
     if Config.TEST_MODE:
         print("\n" + "="*50)
-        print("🧪 测试模式已启动")
+        print("[TEST] 测试模式已启动")
         print("="*50 + "\n")
         import sys
         import os
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from test.stage1_test import run_stage1_tests
 
         import threading
         def run_flask():
@@ -121,11 +127,13 @@ if __name__ == '__main__':
         import time
         time.sleep(2)
 
-        run_stage1_tests()
+        from test.test_runner import run_by_env
+        run_by_env()
+    # 非测试模式，启动Flask应用，根据配置文件中的DEBUG开关设置调试模式和端口号
     else:
         print("\n" + "="*50)
-        print("🚀 霍格沃茨 MIS 系统启动")
-        print(f"📍 运行地址: http://127.0.0.1:{Config.PORT}")
-        print(f"🔧 调试模式: {'开启' if Config.DEBUG else '关闭'}")
+        print("霍格沃茨 MIS 系统启动")
+        print(f"运行地址: http://127.0.0.1:{Config.PORT}")
+        print(f"调试模式: {'开启' if Config.DEBUG else '关闭'}")
         print("="*50 + "\n")
         app.run(debug=Config.DEBUG, port=Config.PORT)
