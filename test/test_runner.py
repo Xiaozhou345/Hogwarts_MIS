@@ -3,6 +3,7 @@ import os
 
 from .stage1_test import run_stage1_tests
 from .stage1_professor_test import run_stage1_professor_tests
+from .stage1_student_public_test import run_stage1_student_public_tests
 
 TEST_SUITES = {
     "auth": {
@@ -16,6 +17,12 @@ TEST_SUITES = {
         "label": "阶段一[教授端]：业务写入测试（组员3 余雨航）",
         "func": run_stage1_professor_tests,
         "module": "stage1_professor_test"
+    },
+    "student": {
+        "name": "stage1_student_public",
+        "label": "阶段一[学生端+公共]：业务读取测试（组员4 费翔鸿）",
+        "func": run_stage1_student_public_tests,
+        "module": "stage1_student_public_test"
     }
 }
 
