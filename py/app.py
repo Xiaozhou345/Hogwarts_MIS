@@ -8,10 +8,14 @@ from config import Config
 from db_utils import execute_query
 from auth_utils import hash_password, verify_password, generate_token, token_required
 from professor_api import professor_bp
+from student_api import student_bp
+from public_api import public_bp
 
 app = Flask(__name__)
 CORS(app)
 app.register_blueprint(professor_bp)
+app.register_blueprint(student_bp)
+app.register_blueprint(public_bp)
 
 @app.route('/api/test_db', methods=['GET'])
 def test_db():
