@@ -79,7 +79,7 @@ def login():
             return jsonify({"code": 400, "msg": "缺少用户名或密码", "data": None}), 400
 
         user = execute_query(
-            "SELECT user_id, password_hash, role FROM sys_user WHERE username = %s",
+            "SELECT user_id, password_hash, role, house_id FROM sys_user WHERE username = %s",
             (username,),
             fetch_one=True
         )
@@ -98,7 +98,8 @@ def login():
             "data": {
                 "token": token,
                 "role": user['role'],
-                "user_id": user['user_id']
+                "user_id": user['user_id'],
+                "house_id": user['house_id']
             }
         })
 

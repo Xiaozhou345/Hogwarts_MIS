@@ -48,3 +48,40 @@ async function register(data) {
     body: JSON.stringify(data)
   });
 }
+
+async function logout() {
+  return request('/logout', {
+    method: 'POST'
+  });
+}
+
+async function getStudents() {
+  return request('/students', {
+    method: 'GET'
+  });
+}
+
+async function submitPoints(data) {
+  return request('/points', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function getProfessorLogs() {
+  return request('/professor/logs', {
+    method: 'GET'
+  });
+}
+
+async function getStudentInfo() {
+  return request('/student/info', {
+    method: 'GET'
+  });
+}
+
+async function getStudentLogs() {
+  return request('/student/logs', {
+    method: 'GET'
+  });
+}

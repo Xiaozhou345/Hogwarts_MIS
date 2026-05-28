@@ -36,8 +36,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       localStorage.setItem('role', res.data.role);
       localStorage.setItem('user_id', res.data.user_id);
       localStorage.setItem('username', username);
+      if (res.data.house_id) {
+        localStorage.setItem('house_id', res.data.house_id);
+      }
       
-      window.location.href = 'welcome.html';
+      if (res.data.role === 1) {
+        window.location.href = 'professor.html';
+      } else {
+        window.location.href = 'student.html';
+      }
     } else {
       errorMsg.textContent = res.msg || '登录失败，请重试';
     }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学生个人中心 - 霍格沃茨学院积分系统</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="magic-particles" id="particles"></div>
+  
+  <div class="auth-container">
+    <div class="auth-card fade-in" style="width: 600px;">
+      <div class="house-crests">
+        <div class="house-crest gryffindor" title="格兰芬多">🦁</div>
+        <div class="house-crest slytherin" title="斯莱特林">🐍</div>
+        <div class="house-crest ravenclaw" title="拉文克劳">🦅</div>
+        <div class="house-crest hufflepuff" title="赫奇帕奇">🦡</div>
+      </div>
+      
+      <div class="seal-stamp">S</div>
+      
+      <h1 class="auth-title">学生个人中心</h1>
+      <div class="magic-divider"></div>
+
+      <div id="infoContainer" class="info-container">
+        <p class="auth-subtitle">加载中...</p>
+      </div>
+
+      <div class="magic-divider" style="margin-top: 30px;"></div>
+      
+      <h2 class="auth-title" style="font-size: 20px; margin-bottom: 15px;">积分变动流水</h2>
+      <div class="logs-container" id="logsContainer">
+        <p class="auth-subtitle">加载中...</p>
+      </div>
+
+      <div class="auth-footer" style="margin-top: 20px;">
+        <button type="button" class="magic-btn" id="logoutBtn" style="width: auto; padding: 8px 20px; font-size: 12px;">
+          退出登录
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dumbledore-panel">
+    <div class="bubble-container" id="bubbleContainer"></div>
+    <div class="dumbledore-avatar">🧙</div>
+    <div class="dumbledore-label">阿不思·邓布利多<br>校长</div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/student.js"></script>
+  <script src="js/bubbles.js"></script>
+  <script src="js/particles.js"></script>
+</body>
+</html>

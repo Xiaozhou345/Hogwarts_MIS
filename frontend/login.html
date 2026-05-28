@@ -5,10 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>登录 - 霍格沃茨学院积分系统</title>
   <link rel="stylesheet" href="css/hogwarts.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="magic-particles" id="particles"></div>
+  
   <div class="auth-container">
     <div class="auth-card fade-in">
+      <div class="house-crests">
+        <div class="house-crest gryffindor" title="格兰芬多">🦁</div>
+        <div class="house-crest slytherin" title="斯莱特林">🐍</div>
+        <div class="house-crest ravenclaw" title="拉文克劳">🦅</div>
+        <div class="house-crest hufflepuff" title="赫奇帕奇">🦡</div>
+      </div>
+      
+      <div class="seal-stamp">H</div>
+      
       <h1 class="auth-title">霍格沃茨</h1>
       <p class="auth-subtitle">学院积分系统</p>
       <div class="magic-divider"></div>
@@ -41,7 +53,15 @@
     </div>
   </div>
 
+  <div class="dumbledore-panel">
+    <div class="bubble-container" id="bubbleContainer"></div>
+    <div class="dumbledore-avatar">🧙</div>
+    <div class="dumbledore-label">阿不思·邓布利多<br>校长</div>
+  </div>
+
   <script src="js/api.js"></script>
   <script src="js/login.js"></script>
+  <script src="js/bubbles.js"></script>
+  <script src="js/particles.js"></script>
 </body>
 </html>

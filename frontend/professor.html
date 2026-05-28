@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>教授工作台 - 霍格沃茨学院积分系统</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="magic-particles" id="particles"></div>
+  
+  <div class="auth-container">
+    <div class="auth-card fade-in" style="width: 600px;">
+      <div class="house-crests">
+        <div class="house-crest gryffindor" title="格兰芬多">🦁</div>
+        <div class="house-crest slytherin" title="斯莱特林">🐍</div>
+        <div class="house-crest ravenclaw" title="拉文克劳">🦅</div>
+        <div class="house-crest hufflepuff" title="赫奇帕奇">🦡</div>
+      </div>
+      
+      <div class="seal-stamp">P</div>
+      
+      <h1 class="auth-title">教授工作台</h1>
+      <p class="auth-subtitle" id="welcomeText">欢迎，教授</p>
+      <div class="magic-divider"></div>
+
+      <div class="form-group">
+        <label class="form-label">选择学生</label>
+        <select id="studentSelect" class="form-select">
+          <option value="">-- 请选择学生 --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">分数变动</label>
+        <input type="number" id="scoreChange" class="form-input" placeholder="正数为加分，负数为扣分" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">原因说明</label>
+        <input type="text" id="reason" class="form-input" placeholder="请输入积分变动原因" required>
+      </div>
+
+      <div class="form-group">
+        <button type="button" class="magic-btn" id="submitBtn">
+          <span id="btnText">提交工单</span>
+        </button>
+        <p id="errorMsg" class="error-message" style="text-align: center;"></p>
+        <p id="successMsg" class="success-message" style="display: none;"></p>
+      </div>
+
+      <div class="magic-divider" style="margin-top: 30px;"></div>
+      
+      <h2 class="auth-title" style="font-size: 20px; margin-bottom: 15px;">操作历史记录</h2>
+      <div class="logs-container" id="logsContainer">
+        <p class="auth-subtitle">加载中...</p>
+      </div>
+
+      <div class="auth-footer" style="margin-top: 20px;">
+        <button type="button" class="magic-btn" id="logoutBtn" style="width: auto; padding: 8px 20px; font-size: 12px;">
+          退出登录
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dumbledore-panel">
+    <div class="bubble-container" id="bubbleContainer"></div>
+    <div class="dumbledore-avatar">🧙</div>
+    <div class="dumbledore-label">阿不思·邓布利多<br>校长</div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/professor.js"></script>
+  <script src="js/bubbles.js"></script>
+  <script src="js/particles.js"></script>
+</body>
+</html>
