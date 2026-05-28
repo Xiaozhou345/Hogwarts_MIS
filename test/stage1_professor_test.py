@@ -192,8 +192,10 @@ def test_get_professor_logs():
         print_result(response)
 
         if response.status_code == 200:
-            logs = response.json().get("data", [])
-            print(f"\n操作记录总数: {len(logs)}")
+            data = response.json().get("data", {})
+            logs = data.get("logs", [])
+            total = data.get("total", len(logs))
+            print(f"\n操作记录总数: {total}")
             for log in logs[:5]:
                 print(f"  - [{log['create_time']}] {log['student_name']}: {log['score_change']:+d} ({log['reason']})")
         return response.status_code == 200

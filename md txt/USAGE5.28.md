@@ -14,12 +14,16 @@ Hogwarts_MIS/
 │   ├── config.py                # 配置文件（数据库、JWT、Debug、测试模式）
 │   ├── db_utils.py              # 数据库工具（连接、execute_query 通用方法）
 │   ├── auth_utils.py            # 认证工具（SHA256 密码加密、JWT 生成/验证、装饰器）
-│   └── professor_api.py         # ★ 教授端业务 API（Blueprint）
+│   ├── professor_api.py         # ★ 教授端业务 API（Blueprint）
+│   ├── student_api.py           # ★ 学生端业务 API（Blueprint）
+│   └── public_api.py            # ★ 公共展示 API（Blueprint）
 ├── test/                        # 测试代码目录
 │   ├── __init__.py
 │   ├── test_runner.py           # ★ 测试调度器（统一入口，支持按模块选择）
 │   ├── stage1_test.py           # 阶段一-鉴权测试（注册、登录、登出）[Noa]
-│   └── stage1_professor_test.py # ★ 阶段一-教授端测试（API、触发器验证）
+│   ├── stage1_professor_test.py # ★ 阶段一-教授端测试（API、触发器验证）
+│   ├── stage1_student_public_test.py # ★ 阶段一-学生端+公共模块测试
+│   └── stage2_professor_test.py # ★ 阶段二-教授端完善测试（边界校验、分页）
 ├── sql/                         # SQL 脚本
 │   ├── db_hogwarts.sql          # 数据库建表脚本（含触发器）
 │   └── test_trigger.sql         # ★ 触发器验证 SQL 测试用例
@@ -63,7 +67,9 @@ TEST_MODE=false
 # "all" = 运行全部测试
 # "auth" = 仅阶段一鉴权测试
 # "professor" = 仅阶段一教授端测试
-# "auth,professor" = 同时运行
+# "student" = 仅阶段一学生端+公共测试
+# "professor2" = 仅阶段二教授端完善测试
+# "auth,professor" = 同时运行多个套件
 TEST_SUITE=all
 ```
 
@@ -99,7 +105,9 @@ python py/app.py
 | TEST_SUITE | `all` | 运行全部测试（默认） |
 | | `auth` | 仅运行阶段一鉴权测试（注册、登录、登出） |
 | | `professor` | 仅运行阶段一教授端测试（积分工单、触发器） |
-| | `auth,professor` | 同时运行两个测试套件 |
+| | `student` | 仅运行阶段一学生端+公共模块测试 |
+| | `professor2` | 仅运行阶段二教授端完善测试（边界校验、分页） |
+| | `auth,professor` | 同时运行多个测试套件 |
 
 ### 命令行手动运行
 ```bash
@@ -107,10 +115,12 @@ python test/test_runner.py                 # 交互式菜单选择
 python test/test_runner.py --all           # 全部测试
 python test/test_runner.py auth            # 仅鉴权测试
 python test/test_runner.py professor       # 仅教授端测试
+python test/test_runner.py student         # 仅学生端+公共测试
+python test/test_runner.py professor2      # 仅阶段二教授端测试
 python test/test_runner.py auth,professor  # 选中多个
 ```
 
-## 已实现的 API 接口（阶段一）
+## 已实现的 API 接口（阶段一 + 阶段二）
 
 ### 用户管理模块（组员2 Noa）
 
@@ -121,13 +131,32 @@ python test/test_runner.py auth,professor  # 选中多个
 | `/api/login` | POST | 用户登录（返回 JWT Token + role） |
 | `/api/logout` | POST | 退出登录（需 Token） |
 
-### 教授端工作台（组员3 余雨航）
+### 教授端工作台（组员3 余雨航）— 阶段二已完善
 
 | 接口 | 方法 | 说明 |
 |------|------|------|
-| `/api/students` | GET | 获取学生下拉列表（需教授 Token，角色校验） |
-| `/api/points` | POST | 提交积分工单（加分/扣分，触发器自动更新学院总分） |
-| `/api/professor/logs` | GET | 获取教授操作历史（多表联查，时间降序） |
+| `/api/students` | GET | 获取学生下拉列表（含学院名称，需教授 Token，角色校验） |
+| `/api/points` | POST | 提交积分工单（加分/扣分 ±100 限制、事由 200 字限制、学院校验，触发器自动更新学院总分） |
+| `/api/professor/logs` | GET | 获取教授操作历史（多表联查、时间降序、支持分页 `?page=&limit=`） |
+
+**阶段二新增增强：**
+- `GET /api/students`：联查 `house` 表返回 `house_name`，前端可直接显示学院名
+- `POST /api/points`：新增分数范围校验（±100）、事由长度校验（≤200字符）、学生学院校验
+- `GET /api/professor/logs`：新增分页参数 `page`/`limit`，返回 `total`/`page`/`limit` 分页信息
+
+### 学生端个人中心（组员4 费翔鸿）
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/student/info` | GET | 获取学生个人信息（联查 house 表，返回学院信息，需学生 Token） |
+| `/api/student/logs` | GET | 获取个人积分流水（支持分页 `?page=&limit=`，含教授姓名） |
+
+### 学院杯大厅公共展示（组员4 费翔鸿）
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/house/ranking` | GET | 学院实时沙漏排行榜（按总分降序，无需登录） |
+| `/api/public/logs` | GET | 全校最新积分动态（支持 `?limit=` 参数，默认10条，最大50条，无需登录） |
 
 ## 认证机制
 
@@ -190,13 +219,33 @@ mysql -u root -p < sql/test_trigger.sql
 5. ✅ 获取教授操作历史
 6. ✅ 权限验证（学生越权访问）
 
-> **汇总：14/14 测试全部通过，通过率 100%**
+### 学生端+公共测试（组员4 费翔鸿）— 7/7 全部通过 ✅
+1. ✅ 获取学生个人信息
+2. ✅ 获取学生积分流水
+3. ✅ 学生积分流水分页
+4. ✅ 学院排行榜查询
+5. ✅ 全校最新积分动态
+6. ✅ 积分动态限制条数
+7. ✅ 权限验证（教授越权访问学生接口）
 
-## 下一步开发
+> **阶段一汇总：21/21 测试全部通过，通过率 100%**
 
-阶段一剩余待完成（组员4 费翔鸿）：
-- 学生端个人中心 API（`/api/student/info`、`/api/student/logs`）
-- 学院杯大厅公共展示 API（`/api/house/ranking`、`/api/public/logs`）
+## 阶段二验收标准（教授端完善）
+
+### 阶段二教授端测试（组员3 余雨航）— 9/9 全部通过 ✅
+1. ✅ 学生列表含学院名称
+2. ✅ 正常提交积分工单（含返回数据验证）
+3. ✅ 超额加分拦截（>+100 被拒绝）
+4. ✅ 超额扣分拦截（>-100 被拒绝）
+5. ✅ 空事由拦截
+6. ✅ 超长事由拦截（>200 字符）
+7. ✅ 操作历史分页功能
+8. ✅ 操作历史总数与数据库一致
+9. ✅ 触发器集成验证
+
+> **阶段二教授端汇总：9/9 测试全部通过，通过率 100%**
+> 
+> **全量汇总：30/30 测试全部通过，通过率 100%**
 
 ## 常见问题
 
@@ -234,4 +283,4 @@ A: 在终端中执行 `chcp 65001` 切换到 UTF-8 编码，或使用 Windows Te
 
 ---
 
-> 更新日期：2026-05-26
+> 更新日期：2026-05-28
