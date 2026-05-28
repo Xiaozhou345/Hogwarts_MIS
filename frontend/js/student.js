@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadStudentInfo();
   await loadStudentLogs();
   
+  document.getElementById('backToHallBtn').addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
   document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 });
 

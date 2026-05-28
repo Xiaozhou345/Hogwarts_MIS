@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>霍格沃茨学院大厅 - Hogwarts Great Hall</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="magic-particles" id="particles"></div>
+  
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <span class="brand-icon">🏰</span>
+      <span class="brand-text">Hogwarts</span>
+    </div>
+    <div class="nav-actions">
+      <button id="loginBtn" class="nav-btn">
+        <span class="btn-icon">🔮</span>
+        <span class="btn-text">Login</span>
+      </button>
+      <button id="userBtn" class="nav-btn user-btn" style="display: none;">
+        <span class="btn-icon">⚡</span>
+        <span class="btn-text" id="userText">用户</span>
+      </button>
+      <button id="logoutBtn" class="nav-btn logout-nav-btn" style="display: none;">
+        <span class="btn-text">退出</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="great-hall-container">
+    <div class="hall-header">
+      <h1 class="hall-title">
+        <span class="title-icon">✨</span>
+        学院杯积分榜
+        <span class="title-icon">✨</span>
+      </h1>
+      <p class="hall-subtitle">The House Cup Standings</p>
+      <div class="magic-divider"></div>
+    </div>
+
+    <div class="ranking-container" id="rankingContainer">
+      <p class="loading-text">🌟 正在召唤学院数据...</p>
+    </div>
+
+    <div class="dumbledore-section">
+      <div class="dumbledore-card">
+        <div class="dumbledore-portrait">🧙</div>
+        <div class="dumbledore-content">
+          <h3 class="dumbledore-name">阿不思·邓布利多</h3>
+          <p class="dumbledore-title">Albus Dumbledore - Headmaster</p>
+          <div class="dumbledore-divider"></div>
+          <p class="dumbledore-message" id="dumbledoreMessage">
+            "在霍格沃茨，我们相信每个学生都有展现自己才华的机会。"
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="recent-activity">
+      <h2 class="activity-title">
+        <span class="title-icon">📜</span>
+        最新积分动态
+      </h2>
+      <div class="activity-container" id="activityContainer">
+        <p class="loading-text">✨ 正在获取最新动态...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="house-crests-floating">
+    <div class="crest gryffindor-crest" title="格兰芬多">🦁</div>
+    <div class="crest slytherin-crest" title="斯莱特林">🐍</div>
+    <div class="crest ravenclaw-crest" title="拉文克劳">🦅</div>
+    <div class="crest hufflepuff-crest" title="赫奇帕奇">🦡</div>
+  </div>
+
+  <div class="dumbledore-panel">
+    <div class="bubble-container" id="bubbleContainer"></div>
+    <div class="dumbledore-avatar">🧙</div>
+    <div class="dumbledore-label">阿不思·邓布利多<br>校长</div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/index.js"></script>
+  <script src="js/bubbles.js"></script>
+  <script src="js/particles.js"></script>
+</body>
+</html>

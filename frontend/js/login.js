@@ -40,11 +40,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         localStorage.setItem('house_id', res.data.house_id);
       }
       
-      if (res.data.role === 1) {
-        window.location.href = 'professor.html';
-      } else {
-        window.location.href = 'student.html';
-      }
+      window.location.href = 'index.html';
     } else {
       errorMsg.textContent = res.msg || '登录失败，请重试';
     }

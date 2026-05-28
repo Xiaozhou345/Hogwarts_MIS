@@ -85,3 +85,15 @@ async function getStudentLogs() {
     method: 'GET'
   });
 }
+
+async function getHouseRanking() {
+  return request('/house/ranking', {
+    method: 'GET'
+  });
+}
+
+async function getPublicLogs() {
+  return request('/public/logs', {
+    method: 'GET'
+  });
+}

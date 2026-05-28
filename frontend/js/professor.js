@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadLogs();
   
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+  document.getElementById('backToHallBtn').addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
   document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 });
 
