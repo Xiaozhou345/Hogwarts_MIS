@@ -19,7 +19,7 @@ def get_student_info():
         user_id = request.user_id
 
         sql = """
-            SELECT u.username, h.house_name, h.total_points
+            SELECT u.username, u.house_id, h.house_name, h.total_points
             FROM sys_user u
             LEFT JOIN house h ON u.house_id = h.house_id
             WHERE u.user_id = %s AND u.role = 0
@@ -41,11 +41,27 @@ def get_student_info():
 def get_student_points_logs():
     """
     学生积分变动明细
+    支持分页：?page=1&limit=10
     返回：logs列表，包含积分变动、事由、操作教授、时间
     """
     try:
         user_id = request.user_id
 
+        # 获取分页参数
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 20, type=int)
+        offset = (page - 1) * limit
+
+        # 查询总数
+        count_sql = """
+            SELECT COUNT(*) as total
+            FROM point_log
+            WHERE student_id = %s
+        """
+        count_result = execute_query(count_sql, (user_id,), fetch_one=True)
+        total = count_result['total'] if count_result else 0
+
+        # 查询分页数据
         sql = """
             SELECT pl.log_id, pl.score_change, pl.reason, pl.create_time,
                    p.username AS professor_name
@@ -53,14 +69,24 @@ def get_student_points_logs():
             JOIN sys_user p ON pl.professor_id = p.user_id
             WHERE pl.student_id = %s
             ORDER BY pl.create_time DESC
+            LIMIT %s OFFSET %s
         """
-        logs = execute_query(sql, (user_id,), fetch_all=True)
+        logs = execute_query(sql, (user_id, limit, offset), fetch_all=True)
 
         for log in logs:
             if hasattr(log['create_time'], 'isoformat'):
                 log['create_time'] = log['create_time'].isoformat()
 
-        return jsonify({"code": 200, "msg": "success", "data": logs})
+        return jsonify({
+            "code": 200,
+            "msg": "success",
+            "data": {
+                "logs": logs,
+                "total": total,
+                "page": page,
+                "limit": limit
+            }
+        })
 
     except Exception as e:
         return jsonify({"code": 500, "msg": f"服务器错误: {str(e)}", "data": None}), 500

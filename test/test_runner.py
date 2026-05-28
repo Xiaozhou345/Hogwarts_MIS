@@ -1,10 +1,13 @@
 import sys
 import os
 
-from .stage1_test import run_stage1_tests
-from .stage1_professor_test import run_stage1_professor_tests
-from .stage1_student_public_test import run_stage1_student_public_tests
-from .stage2_professor_test import run_stage2_professor_tests
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from test.stage1_test import run_stage1_tests
+from test.stage1_professor_test import run_stage1_professor_tests
+from test.stage1_student_public_test import run_stage1_student_public_tests
+from test.stage2_professor_test import run_stage2_professor_tests
 
 TEST_SUITES = {
     "auth": {
