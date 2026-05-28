@@ -97,3 +97,128 @@ async function getPublicLogs() {
     method: 'GET'
   });
 }
+
+async function createCourse(data) {
+  return request('/professor/course', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function getProfessorCourses() {
+  return request('/professor/courses', {
+    method: 'GET'
+  });
+}
+
+async function updateCourse(courseId, data) {
+  return request(`/professor/course/${courseId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+async function deleteCourse(courseId) {
+  return request(`/professor/course/${courseId}`, {
+    method: 'DELETE'
+  });
+}
+
+async function addCourseSchedule(courseId, data) {
+  return request(`/professor/course/${courseId}/schedule`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function getCourseSchedule(courseId) {
+  return request(`/professor/course/${courseId}/schedule`, {
+    method: 'GET'
+  });
+}
+
+async function deleteSchedule(scheduleId) {
+  return request(`/professor/schedule/${scheduleId}`, {
+    method: 'DELETE'
+  });
+}
+
+async function getEnrolledStudents(courseId) {
+  return request(`/professor/course/${courseId}/students`, {
+    method: 'GET'
+  });
+}
+
+async function recordClassPerformance(data) {
+  return request('/professor/class-performance', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function getCoursePerformances(courseId) {
+  return request(`/professor/course/${courseId}/performances`, {
+    method: 'GET'
+  });
+}
+
+async function getAvailableCourses() {
+  return request('/student/courses/available', {
+    method: 'GET'
+  });
+}
+
+async function getCourseDetail(courseId) {
+  return request(`/student/course/${courseId}`, {
+    method: 'GET'
+  });
+}
+
+async function enrollCourse(data) {
+  return request('/student/enroll', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function dropCourse(enrollmentId) {
+  return request(`/student/enroll/${enrollmentId}`, {
+    method: 'DELETE'
+  });
+}
+
+async function getMyCourses() {
+  return request('/student/my-courses', {
+    method: 'GET'
+  });
+}
+
+async function getMySchedule() {
+  return request('/student/schedule', {
+    method: 'GET'
+  });
+}
+
+async function getMyPerformances() {
+  return request('/student/my-performances', {
+    method: 'GET'
+  });
+}
+
+async function getAllCourses() {
+  return request('/public/courses', {
+    method: 'GET'
+  });
+}
+
+async function getPopularCourses() {
+  return request('/public/courses/popular', {
+    method: 'GET'
+  });
+}
+
+async function getHouseCourseStats() {
+  return request('/public/courses/house-stats', {
+    method: 'GET'
+  });
+}

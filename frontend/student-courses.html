@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>课程中心 - 霍格沃茨学生选课</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="magic-particles" id="particles"></div>
+  
+  <div class="auth-container">
+    <div class="auth-card fade-in course-card" style="width: 900px;">
+      <div class="house-crests">
+        <div class="house-crest gryffindor" title="格兰芬多">🦁</div>
+        <div class="house-crest slytherin" title="斯莱特林">🐍</div>
+        <div class="house-crest ravenclaw" title="拉文克劳">🦅</div>
+        <div class="house-crest hufflepuff" title="赫奇帕奇">🦡</div>
+      </div>
+      
+      <div class="seal-stamp">📖</div>
+      
+      <h1 class="auth-title">课程中心</h1>
+      <p class="auth-subtitle" id="welcomeText">探索魔法知识的殿堂</p>
+      <div class="magic-divider"></div>
+
+      <div class="tab-container" style="margin-bottom: 30px;">
+        <button class="tab-btn active" data-tab="available">可选课程</button>
+        <button class="tab-btn" data-tab="my-courses">我的课程</button>
+        <button class="tab-btn" data-tab="schedule">课程表</button>
+        <button class="tab-btn" data-tab="performances">课堂表现</button>
+      </div>
+
+      <div id="availableTab" class="tab-content active">
+        <div id="availableCoursesContainer" class="courses-grid">
+          <p class="loading-text">正在加载可选课程...</p>
+        </div>
+      </div>
+
+      <div id="myCoursesTab" class="tab-content">
+        <div id="myCoursesContainer" class="courses-grid">
+          <p class="loading-text">正在加载我的课程...</p>
+        </div>
+      </div>
+
+      <div id="scheduleTab" class="tab-content">
+        <div id="scheduleContainer" class="schedule-table-container">
+          <p class="loading-text">正在加载课程表...</p>
+        </div>
+      </div>
+
+      <div id="performancesTab" class="tab-content">
+        <div id="performancesContainer" class="performances-list">
+          <p class="loading-text">正在加载课堂表现...</p>
+        </div>
+      </div>
+
+      <div class="auth-footer" style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+        <button type="button" class="magic-btn" id="backToHallBtn" style="width: auto; padding: 8px 20px; font-size: 12px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(26, 26, 46, 0.9) 100%); border: 2px solid var(--hogwarts-gold); color: var(--hogwarts-gold);">
+          🏰 返回大厅
+        </button>
+        <button type="button" class="magic-btn" id="logoutBtn" style="width: auto; padding: 8px 20px; font-size: 12px;">
+          退出登录
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="courseDetailModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="detailModalTitle">课程详情</h2>
+        <button class="modal-close" id="closeDetailModalBtn">&times;</button>
+      </div>
+      <div class="modal-body" id="courseDetailContent">
+      </div>
+    </div>
+  </div>
+
+  <div class="dumbledore-panel">
+    <div class="bubble-container" id="bubbleContainer"></div>
+    <div class="dumbledore-avatar">🧙</div>
+    <div class="dumbledore-label">阿不思·邓布利多<br>校长</div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/student-courses.js"></script>
+  <script src="js/bubbles.js"></script>
+  <script src="js/particles.js"></script>
+</body>
+</html>

@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadStudentInfo();
   await loadStudentLogs();
   
+  document.getElementById('coursesBtn').addEventListener('click', () => {
+    window.location.href = 'student-courses.html';
+  });
   document.getElementById('backToHallBtn').addEventListener('click', () => {
     window.location.href = 'index.html';
   });

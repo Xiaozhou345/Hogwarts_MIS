@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>课程管理 - 霍格沃茨教授工作台</title>
+  <link rel="stylesheet" href="css/hogwarts.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="magic-particles" id="particles"></div>
+  
+  <div class="auth-container">
+    <div class="auth-card fade-in course-card" style="width: 900px;">
+      <div class="house-crests">
+        <div class="house-crest gryffindor" title="格兰芬多">🦁</div>
+        <div class="house-crest slytherin" title="斯莱特林">🐍</div>
+        <div class="house-crest ravenclaw" title="拉文克劳">🦅</div>
+        <div class="house-crest hufflepuff" title="赫奇帕奇">🦡</div>
+      </div>
+      
+      <div class="seal-stamp">📚</div>
+      
+      <h1 class="auth-title">课程管理</h1>
+      <p class="auth-subtitle" id="welcomeText">教授课程工作台</p>
+      <div class="magic-divider"></div>
+
+      <div class="course-actions" style="margin-bottom: 30px;">
+        <button type="button" class="magic-btn" id="createCourseBtn" style="width: auto; padding: 10px 30px;">
+          <span>+ 创建新课程</span>
+        </button>
+      </div>
+
+      <div id="coursesContainer" class="courses-grid">
+        <p class="loading-text">正在加载课程...</p>
+      </div>
+
+      <div id="courseModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="modalTitle">创建课程</h2>
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="courseForm">
+              <div class="form-group">
+                <label class="form-label">课程名称</label>
+                <input type="text" id="courseName" class="form-input" placeholder="例如：魔药学" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">学分</label>
+                <input type="number" id="courseCredits" class="form-input" placeholder="1-5" min="1" max="5" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">课程描述</label>
+                <textarea id="courseDescription" class="form-input" rows="3" placeholder="课程简介..."></textarea>
+              </div>
+              <div class="form-group" style="text-align: center;">
+                <button type="submit" class="magic-btn" id="submitCourseBtn">
+                  <span id="courseBtnText">创建</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="scheduleModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>课程安排</h2>
+            <button class="modal-close" id="closeScheduleModalBtn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="scheduleForm">
+              <input type="hidden" id="scheduleCourseId">
+              <div class="form-group">
+                <label class="form-label">星期</label>
+                <select id="scheduleWeekday" class="form-select" required>
+                  <option value="1">周一</option>
+                  <option value="2">周二</option>
+                  <option value="3">周三</option>
+                  <option value="4">周四</option>
+                  <option value="5">周五</option>
+                  <option value="6">周六</option>
+                  <option value="7">周日</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">开始时间</label>
+                <input type="time" id="scheduleStartTime" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">结束时间</label>
+                <input type="time" id="scheduleEndTime" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">教室</label>
+                <input type="text" id="scheduleClassroom" class="form-input" placeholder="例如：地下教室" required>
+              </div>
+              <div class="form-group" style="text-align: center;">
+                <button type="submit" class="magic-btn">添加安排</button>
+              </div>
+            </form>
+            <div id="existingSchedule" style="margin-top: 20px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="performanceModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+          <div class="modal-header">
+            <h2>记录课堂表现</h2>
+            <button class="modal-close" id="closePerformanceModalBtn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="performanceForm">
+              <input type="hidden" id="performanceCourseId">
+              <div class="form-group">
+                <label class="form-label">选择学生</label>
+                <select id="performanceStudent" class="form-select" required>
+                  <option value="">-- 加载中 --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">表现类型</label>
+                <select id="performanceType" class="form-select" required>
+                  <option value="1">回答问题</option>
+                  <option value="2">课堂作业</option>
+                  <option value="3">小组合作</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">积分变动</label>
+                <input type="number" id="performanceScore" class="form-input" placeholder="正数为加分，负数为扣分" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">原因说明</label>
+                <input type="text" id="performanceReason" class="form-input" placeholder="例如：魔药课回答正确" required>
+              </div>
+              <div class="form-group" style="text-align: center;">
+                <button type="submit" class="magic-btn">记录表现</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-footer" style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+        <button type="button" class="magic-btn" id="backToHallBtn" style="width: auto; padding: 8px 20px; font-size: 12px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(26, 26, 46, 0.9) 100%); border: 2px solid var(--hogwarts-gold); color: var(--hogwarts-gold);">
+          🏰 返回大厅
+        </button>
+        <button type="button" class="magic-btn" id="logoutBtn" style="width: auto; padding: 8px 20px; font-size: 12px;">
+          退出登录
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dumbledore-panel">
+    <div class="bubble-container" id="bubbleContainer"></div>
+    <div class="dumbledore-avatar">🧙</div>
+    <div class="dumbledore-label">阿不思·邓布利多<br>校长</div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/professor-courses.js"></script>
+  <script src="js/bubbles.js"></script>
+  <script src="js/particles.js"></script>
+</body>
+</html>
