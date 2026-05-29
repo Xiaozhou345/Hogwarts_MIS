@@ -105,3 +105,4 @@ CREATE TABLE class_performance (
     FOREIGN KEY (professor_id) REFERENCES sys_user(user_id),
     FOREIGN KEY (point_log_id) REFERENCES point_log(log_id)
 );
+
