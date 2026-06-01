@@ -283,14 +283,15 @@ async function handleDeleteSchedule(scheduleId, courseId) {
 async function showEnrolledStudents(courseId, courseName) {
   try {
     const res = await getEnrolledStudents(courseId);
-    
+
     if (res.code === 200 && res.data) {
       let message = `《${courseName}》选课学生名单：\n\n`;
       if (res.data.length === 0) {
         message += '暂无学生选课';
       } else {
         res.data.forEach((student, index) => {
-          message += `${index + 1}. ${student.username} (学院ID: ${student.house_id})\n`;
+          // 修复：使用 student_name 而不是 username
+          message += `${index + 1}. ${student.student_name} (${student.house_name})\n`;
         });
       }
       alert(message);
@@ -303,18 +304,35 @@ async function showEnrolledStudents(courseId, courseName) {
   }
 }
 
-function openPerformanceModal(courseId) {
+async function openPerformanceModal(courseId) {
   document.getElementById('performanceCourseId').value = courseId;
-  
+
   const studentSelect = document.getElementById('performanceStudent');
-  studentSelect.innerHTML = '<option value="">-- 请选择学生 --</option>';
-  allStudents.forEach(student => {
-    const option = document.createElement('option');
-    option.value = student.user_id;
-    option.textContent = `${student.username} (学院ID: ${student.house_id})`;
-    studentSelect.appendChild(option);
-  });
-  
+  studentSelect.innerHTML = '<option value="">-- 加载中 --</option>';
+
+  // 修复：只显示已选该课程的学生
+  try {
+    const res = await getEnrolledStudents(courseId);
+    if (res.code === 200 && res.data) {
+      studentSelect.innerHTML = '<option value="">-- 请选择学生 --</option>';
+      if (res.data.length === 0) {
+        studentSelect.innerHTML = '<option value="">-- 暂无学生选课 --</option>';
+      } else {
+        res.data.forEach(student => {
+          const option = document.createElement('option');
+          option.value = student.student_id;
+          option.textContent = `${student.student_name} (${student.house_name})`;
+          studentSelect.appendChild(option);
+        });
+      }
+    } else {
+      studentSelect.innerHTML = '<option value="">-- 加载失败 --</option>';
+    }
+  } catch (err) {
+    console.error('加载选课学生失败:', err);
+    studentSelect.innerHTML = '<option value="">-- 加载失败 --</option>';
+  }
+
   document.getElementById('performanceModal').style.display = 'flex';
 }
 

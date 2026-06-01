@@ -131,12 +131,16 @@ function createAvailableCourseCard(course) {
 
 async function handleEnroll(courseId, courseName) {
   if (!confirm(`确定要选修《${courseName}》吗？`)) return;
-  
+
   try {
     const res = await enrollCourse({ course_id: parseInt(courseId) });
     if (res.code === 200) {
       alert('选课成功！');
       await loadAvailableCourses();
+      // 修复：如果课程详情弹窗打开，刷新详情以更新选课人数
+      if (document.getElementById('courseDetailModal').style.display === 'flex') {
+        await showCourseDetail(courseId);
+      }
     } else {
       alert(res.msg || '选课失败');
     }
@@ -260,32 +264,48 @@ function closeDetailModal() {
   document.getElementById('courseDetailModal').style.display = 'none';
 }
 
+// 时间字符串转分钟数（用于数值比较）
+function timeToMinutes(timeStr) {
+  if (!timeStr) return 0;
+  const parts = timeStr.split(':');
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  return hours * 60 + minutes;
+}
+
 async function loadMySchedule() {
   const container = document.getElementById('scheduleContainer');
-  
+
   try {
     const res = await getMySchedule();
-    
+
     if (res.code === 200 && res.data) {
       const weekData = res.data;
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       const dayNames = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-      
+
       let html = '<table class="schedule-table">';
       html += '<thead><tr><th>时间</th>';
       dayNames.forEach(day => {
         html += `<th>${day}</th>`;
       });
       html += '</tr></thead><tbody>';
-      
+
       const timeSlots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
-      
+
       timeSlots.forEach(time => {
         html += `<tr><td class="time-cell">${time}</td>`;
+        const slotMinutes = timeToMinutes(time);
+
         days.forEach(day => {
           const courses = weekData[day] || [];
-          const course = courses.find(c => c.start_time <= time && c.end_time > time);
-          
+          // 修复：使用数值比较而不是字符串比较
+          const course = courses.find(c => {
+            const startMinutes = timeToMinutes(c.start_time);
+            const endMinutes = timeToMinutes(c.end_time);
+            return slotMinutes >= startMinutes && slotMinutes < endMinutes;
+          });
+
           if (course) {
             html += `
               <td class="course-cell">
@@ -300,7 +320,7 @@ async function loadMySchedule() {
         });
         html += '</tr>';
       });
-      
+
       html += '</tbody></table>';
       container.innerHTML = html;
     } else if (res.code === 200) {
@@ -316,21 +336,22 @@ async function loadMySchedule() {
 
 async function loadMyPerformances() {
   const container = document.getElementById('performancesContainer');
-  
+
   try {
     const res = await getMyPerformances();
-    
-    if (res.code === 200 && res.data && res.data.length > 0) {
+
+    // 修复：后端返回的是 {performances: [...], total, page, limit}，不是直接的数组
+    if (res.code === 200 && res.data && res.data.performances && res.data.performances.length > 0) {
       container.innerHTML = '';
-      
-      res.data.forEach(perf => {
+
+      res.data.performances.forEach(perf => {
         const item = document.createElement('div');
         item.className = 'performance-item';
-        
+
         const scoreClass = perf.score > 0 ? 'score-positive' : 'score-negative';
         const scoreText = perf.score > 0 ? `+${perf.score}` : perf.score;
         const time = new Date(perf.create_time).toLocaleString('zh-CN');
-        
+
         item.innerHTML = `
           <div class="performance-header">
             <span class="performance-course">📚 ${perf.course_name}</span>
@@ -343,7 +364,7 @@ async function loadMyPerformances() {
             <p><strong>时间：</strong>${time}</p>
           </div>
         `;
-        
+
         container.appendChild(item);
       });
     } else if (res.code === 200) {
