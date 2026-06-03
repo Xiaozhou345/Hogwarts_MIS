@@ -130,18 +130,13 @@ def get_course_detail(course_id):
         """
         schedules = execute_query(schedule_sql, (course_id,), fetch_all=True)
         for s in schedules:
-            # 处理 start_time
-            if s['start_time'] is not None:
-                if hasattr(s['start_time'], 'isoformat'):
-                    s['start_time'] = s['start_time'].isoformat()
-                else:
-                    # 如果是 timedelta，转为字符串 "HH:MM:SS"
-                    s['start_time'] = str(s['start_time'])
-        if s['end_time'] is not None:
-            if hasattr(s['end_time'], 'isoformat'):
-                s['end_time'] = s['end_time'].isoformat()
-            else:
-                s['end_time'] = str(s['end_time'])
+            for time_field in ['start_time', 'end_time']:
+                val = s.get(time_field)
+                if val is not None:
+                    if hasattr(val, 'isoformat'):
+                        s[time_field] = val.isoformat()
+                    else:
+                        s[time_field] = str(val)
         course['schedules'] = schedules
         return jsonify({"code": 200, "msg": "success", "data": course})
     except Exception as e:

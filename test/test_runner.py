@@ -9,6 +9,7 @@ from .stage1_professor_test import run_stage1_professor_tests
 from .stage1_student_public_test import run_stage1_student_public_tests
 from .stage2_professor_test import run_stage2_professor_tests
 from .stage3_professor_course_test import run_stage3_professor_course_tests
+from .stage3_student_schedule_test import run_stage3_student_schedule_tests
 from .test_frontend import test_flow as run_frontend_test
 
 
@@ -51,6 +52,12 @@ TEST_SUITES = {
         "label": "阶段三[教授端课程系统]：课程管理+课堂表现（组员3 余雨航）",
         "func": run_stage3_professor_course_tests,
         "module": "stage3_professor_course_test"
+    },
+    "schedule": {
+        "name": "stage3_schedule",
+        "label": "阶段三补充[学生课程表]：课程表展示验证（组员3 余雨航）",
+        "func": run_stage3_student_schedule_tests,
+        "module": "stage3_student_schedule_test"
     },
     "frontend": {
         "name": "frontend_test",
