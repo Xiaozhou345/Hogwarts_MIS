@@ -35,7 +35,8 @@ async function loadStudents() {
       res.data.forEach(student => {
         const option = document.createElement('option');
         option.value = student.user_id;
-        option.textContent = `${student.username} (学院ID: ${student.house_id})`;
+        // 修复：显示学院名称而非学院ID
+        option.textContent = `${student.username} (${student.house_name})`;
         studentSelect.appendChild(option);
       });
     } else {
@@ -108,11 +109,12 @@ async function handleSubmit() {
 
 async function loadLogs() {
   const logsContainer = document.getElementById('logsContainer');
-  
+
   try {
     const res = await getProfessorLogs();
-    
-    if (res.code === 200 && res.data && res.data.length > 0) {
+
+    // 修复：后端返回分页格式 {logs: [...], total, page, limit}
+    if (res.code === 200 && res.data && res.data.logs && res.data.logs.length > 0) {
       let tableHTML = `
         <table class="logs-table">
           <thead>
@@ -125,8 +127,8 @@ async function loadLogs() {
           </thead>
           <tbody>
       `;
-      
-      res.data.forEach(log => {
+
+      res.data.logs.forEach(log => {
         const scoreClass = log.score_change > 0 ? 'score-positive' : 'score-negative';
         const scoreText = log.score_change > 0 ? `+${log.score_change}` : log.score_change;
         const time = new Date(log.create_time).toLocaleString('zh-CN');
