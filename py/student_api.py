@@ -83,7 +83,7 @@ def get_available_courses():
         sql = """
             SELECT c.course_id, c.course_name, c.credits, c.description,
                    p.username AS professor_name,
-                   (SELECT COUNT(*) FROM course_enrollment ce WHERE ce.course_id = c.course_id AND ce.status = 1) AS enrolled_count
+                   (SELECT COUNT(*) FROM course_enrollment ce WHERE ce.course_id = c.course_id AND ce.status = 1) AS enrollment_count
             FROM course c
             JOIN sys_user p ON c.professor_id = p.user_id
             WHERE c.course_id NOT IN (
@@ -112,7 +112,7 @@ def get_course_detail(course_id):
         sql = """
             SELECT c.course_id, c.course_name, c.credits, c.description,
                    p.username AS professor_name,
-                   (SELECT COUNT(*) FROM course_enrollment ce WHERE ce.course_id = c.course_id AND ce.status = 1) AS enrolled_count
+                   (SELECT COUNT(*) FROM course_enrollment ce WHERE ce.course_id = c.course_id AND ce.status = 1) AS enrollment_count
             FROM course c
             JOIN sys_user p ON c.professor_id = p.user_id
             WHERE c.course_id = %s

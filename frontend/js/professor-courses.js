@@ -12,8 +12,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const username = localStorage.getItem('username');
   
   if (!token || role !== '1') {
-    alert('请先以教授身份登录');
-    window.location.href = 'login.html';
+    UIToast.error('请先以教授身份登录');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1500);
     return;
   }
   
@@ -164,34 +166,35 @@ async function handleCourseSubmit(e) {
     }
     
     if (res.code === 200) {
-      alert(currentEditCourseId ? '课程更新成功！' : '课程创建成功！');
+      UIToast.success(currentEditCourseId ? '课程更新成功！' : '课程创建成功！');
       closeCourseModal();
       await loadCourses();
     } else {
-      alert(res.msg || '操作失败');
+      UIToast.error(res.msg || '操作失败');
     }
   } catch (err) {
     console.error('提交失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
 async function handleDeleteCourse(courseId, courseName) {
-  if (!confirm(`确定要删除课程"${courseName}"吗？此操作不可撤销！`)) {
+  const confirmed = await UIConfirm.delete(courseName);
+  if (!confirmed) {
     return;
   }
   
   try {
     const res = await deleteCourse(courseId);
     if (res.code === 200) {
-      alert('课程已删除');
+      UIToast.success('课程已删除');
       await loadCourses();
     } else {
-      alert(res.msg || '删除失败');
+      UIToast.error(res.msg || '删除失败');
     }
   } catch (err) {
     console.error('删除失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
@@ -241,42 +244,67 @@ async function handleScheduleSubmit(e) {
   e.preventDefault();
   
   const courseId = document.getElementById('scheduleCourseId').value;
+  const startTime = document.getElementById('scheduleStartTime').value;
+  const endTime = document.getElementById('scheduleEndTime').value;
+  
+  if (!startTime || !endTime) {
+    UIToast.error('请选择开始和结束时间');
+    return;
+  }
+  
+  const startMinutes = timeToMinutes(startTime);
+  const endMinutes = timeToMinutes(endTime);
+  
+  if (endMinutes <= startMinutes) {
+    UIToast.error('结束时间必须晚于开始时间');
+    return;
+  }
+  
   const data = {
     weekday: parseInt(document.getElementById('scheduleWeekday').value),
-    start_time: document.getElementById('scheduleStartTime').value,
-    end_time: document.getElementById('scheduleEndTime').value,
+    start_time: startTime + ':00',
+    end_time: endTime + ':00',
     classroom: document.getElementById('scheduleClassroom').value.trim()
   };
   
   try {
     const res = await addCourseSchedule(courseId, data);
     if (res.code === 200) {
-      alert('课程安排添加成功！');
+      UIToast.success('课程安排添加成功！');
       document.getElementById('scheduleForm').reset();
       await loadCourseSchedule(courseId);
     } else {
-      alert(res.msg || '添加失败');
+      UIToast.error(res.msg || '添加失败');
     }
   } catch (err) {
     console.error('添加失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
+function timeToMinutes(timeStr) {
+  if (!timeStr) return 0;
+  const parts = timeStr.split(':');
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  return hours * 60 + minutes;
+}
+
 async function handleDeleteSchedule(scheduleId, courseId) {
-  if (!confirm('确定删除此课程安排？')) return;
+  const confirmed = await UIConfirm.confirm('确定删除此课程安排？', '删除课程安排');
+  if (!confirmed) return;
   
   try {
     const res = await deleteSchedule(scheduleId);
     if (res.code === 200) {
-      alert('已删除');
+      UIToast.success('已删除');
       await loadCourseSchedule(courseId);
     } else {
-      alert(res.msg || '删除失败');
+      UIToast.error(res.msg || '删除失败');
     }
   } catch (err) {
     console.error('删除失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
@@ -294,13 +322,19 @@ async function showEnrolledStudents(courseId, courseName) {
           message += `${index + 1}. ${student.student_name} (${student.house_name})\n`;
         });
       }
-      alert(message);
+      await UIConfirm.show({
+        title: '选课学生名单',
+        message: message.replace(/《.*?》选课学生名单：\n\n/, ''),
+        confirmText: '关闭',
+        cancelText: '',
+        icon: '📋'
+      });
     } else {
-      alert('加载失败');
+      UIToast.error('加载失败');
     }
   } catch (err) {
     console.error('加载学生名单失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
@@ -355,14 +389,14 @@ async function handlePerformanceSubmit(e) {
   try {
     const res = await recordClassPerformance(data);
     if (res.code === 200) {
-      alert('课堂表现记录成功！积分已自动更新');
+      UIToast.success('课堂表现记录成功！积分已自动更新');
       closePerformanceModal();
     } else {
-      alert(res.msg || '记录失败');
+      UIToast.error(res.msg || '记录失败');
     }
   } catch (err) {
     console.error('记录失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 

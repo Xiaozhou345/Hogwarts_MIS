@@ -10,8 +10,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const role = localStorage.getItem('role');
   
   if (!token || role !== '0') {
-    alert('请先以学生身份登录');
-    window.location.href = 'login.html';
+    UIToast.error('请先以学生身份登录');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1500);
     return;
   }
   

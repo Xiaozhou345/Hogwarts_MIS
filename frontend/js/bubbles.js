@@ -13,8 +13,12 @@ const schoolRules = [
 
 let currentRuleIndex = 0;
 const maxVisibleBubbles = 4;
+let bubbleInterval = null;
+let isDragging = false;
 
 function createBubble(text) {
+  if (isDragging) return;
+  
   const container = document.getElementById('bubbleContainer');
   if (!container) return;
   
@@ -48,7 +52,95 @@ function initBubbles() {
   createBubble(schoolRules[0]);
   currentRuleIndex = 1;
   
-  setInterval(showNextRule, 4000);
+  bubbleInterval = setInterval(showNextRule, 4000);
 }
 
-document.addEventListener('DOMContentLoaded', initBubbles);
+function initDraggableDumbledore() {
+  const panel = document.querySelector('.dumbledore-panel');
+  const avatar = document.querySelector('.dumbledore-avatar');
+  
+  if (!panel || !avatar) return;
+  
+  let isDraggingLocal = false;
+  let startX, startY, initialX, initialY;
+  
+  avatar.style.cursor = 'grab';
+  
+  function onMouseDown(e) {
+    isDraggingLocal = true;
+    isDragging = true;
+    avatar.style.cursor = 'grabbing';
+    
+    startX = e.clientX;
+    startY = e.clientY;
+    
+    const rect = panel.getBoundingClientRect();
+    initialX = rect.left;
+    initialY = rect.top;
+    
+    panel.style.transition = 'none';
+    
+    const bubbleContainer = document.getElementById('bubbleContainer');
+    if (bubbleContainer) {
+      bubbleContainer.style.opacity = '0';
+    }
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    
+    e.preventDefault();
+  }
+  
+  function onMouseMove(e) {
+    if (!isDraggingLocal) return;
+    
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    
+    let newX = initialX + deltaX;
+    let newY = initialY + deltaY;
+    
+    const panelRect = panel.getBoundingClientRect();
+    const maxX = window.innerWidth - panelRect.width;
+    const maxY = window.innerHeight - panelRect.height;
+    
+    newX = Math.max(0, Math.min(newX, maxX));
+    newY = Math.max(0, Math.min(newY, maxY));
+    
+    panel.style.left = newX + 'px';
+    panel.style.top = newY + 'px';
+    panel.style.right = 'auto';
+    panel.style.transform = 'none';
+  }
+  
+  function onMouseUp(e) {
+    if (!isDraggingLocal) return;
+    
+    isDraggingLocal = false;
+    isDragging = false;
+    avatar.style.cursor = 'grab';
+    
+    panel.style.transition = 'all 0.3s ease';
+    
+    setTimeout(() => {
+      const bubbleContainer = document.getElementById('bubbleContainer');
+      if (bubbleContainer) {
+        bubbleContainer.style.opacity = '1';
+      }
+    }, 300);
+    
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+  
+  avatar.addEventListener('mousedown', onMouseDown);
+  
+  avatar.addEventListener('dragstart', (e) => {
+    e.preventDefault();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initBubbles();
+  initDraggableDumbledore();
+});

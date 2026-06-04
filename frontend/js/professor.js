@@ -4,8 +4,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const username = localStorage.getItem('username');
   
   if (!token || role !== '1') {
-    alert('请先以教授身份登录');
-    window.location.href = 'login.html';
+    UIToast.error('请先以教授身份登录');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1500);
     return;
   }
   

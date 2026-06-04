@@ -12,6 +12,11 @@ async function request(url, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
   
+  const showLoading = options.showLoading !== false;
+  if (showLoading && typeof UILoading !== 'undefined') {
+    UILoading.show();
+  }
+  
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, {
       ...options,
@@ -25,6 +30,9 @@ async function request(url, options = {}) {
       localStorage.removeItem('role');
       localStorage.removeItem('username');
       localStorage.removeItem('house_id');
+      if (typeof UILoading !== 'undefined') {
+        UILoading.forceHide();
+      }
       window.location.href = 'login.html';
     }
     
@@ -32,6 +40,10 @@ async function request(url, options = {}) {
   } catch (error) {
     console.error('API Error:', error);
     throw error;
+  } finally {
+    if (showLoading && typeof UILoading !== 'undefined') {
+      UILoading.hide();
+    }
   }
 }
 

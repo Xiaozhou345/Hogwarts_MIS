@@ -15,8 +15,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const username = localStorage.getItem('username');
   
   if (!token || role !== '0') {
-    alert('请先以学生身份登录');
-    window.location.href = 'login.html';
+    UIToast.error('请先以学生身份登录');
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1500);
     return;
   }
   
@@ -119,7 +121,7 @@ function createAvailableCourseCard(course) {
     const isEnrolled = enrollBtn.dataset.enrolled === 'true';
     
     if (isEnrolled) {
-      alert('您已经选了这门课');
+      UIToast.warning('您已经选了这门课');
       return;
     }
     
@@ -130,23 +132,24 @@ function createAvailableCourseCard(course) {
 }
 
 async function handleEnroll(courseId, courseName) {
-  if (!confirm(`确定要选修《${courseName}》吗？`)) return;
+  const confirmed = await UIConfirm.enroll(courseName);
+  if (!confirmed) return;
 
   try {
     const res = await enrollCourse({ course_id: parseInt(courseId) });
     if (res.code === 200) {
-      alert('选课成功！');
+      UIToast.success('选课成功！');
       await loadAvailableCourses();
       // 修复：如果课程详情弹窗打开，刷新详情以更新选课人数
       if (document.getElementById('courseDetailModal').style.display === 'flex') {
         await showCourseDetail(courseId);
       }
     } else {
-      alert(res.msg || '选课失败');
+      UIToast.error(res.msg || '选课失败');
     }
   } catch (err) {
     console.error('选课失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
@@ -206,19 +209,20 @@ function createMyCourseCard(course) {
 }
 
 async function handleDropCourse(enrollmentId, courseName) {
-  if (!confirm(`确定要退选《${courseName}》吗？`)) return;
+  const confirmed = await UIConfirm.drop(courseName);
+  if (!confirmed) return;
   
   try {
     const res = await dropCourse(enrollmentId);
     if (res.code === 200) {
-      alert('已退课');
+      UIToast.success('已退课');
       await loadMyCourses();
     } else {
-      alert(res.msg || '退课失败');
+      UIToast.error(res.msg || '退课失败');
     }
   } catch (err) {
     console.error('退课失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
@@ -252,11 +256,11 @@ async function showCourseDetail(courseId) {
       document.getElementById('detailModalTitle').textContent = '课程详情';
       document.getElementById('courseDetailModal').style.display = 'flex';
     } else {
-      alert('加载课程详情失败');
+      UIToast.error('加载课程详情失败');
     }
   } catch (err) {
     console.error('加载课程详情失败:', err);
-    alert('网络错误');
+    UIToast.error('网络错误');
   }
 }
 
@@ -278,9 +282,19 @@ async function loadMySchedule() {
 
   try {
     const res = await getMySchedule();
+    
+    console.log('课程表API返回:', res);
 
     if (res.code === 200 && res.data) {
       const weekData = res.data;
+      
+      const hasAnyCourse = Object.values(weekData).some(day => day && day.length > 0);
+      
+      if (!hasAnyCourse) {
+        container.innerHTML = '<p class="no-data">还没有选课，暂无课程表<br><small>请先到"可选课程"中选课</small></p>';
+        return;
+      }
+      
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       const dayNames = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
@@ -307,8 +321,14 @@ async function loadMySchedule() {
           });
 
           if (course) {
+            const colorStyle = getCourseColorStyle(course.course_id, course.course_name);
+            console.log(`应用颜色到课程 "${course.course_name}":`, JSON.stringify(colorStyle));
             html += `
-              <td class="course-cell">
+              <td class="course-cell" 
+                  style="background: ${colorStyle.bg}; border-left: 4px solid ${colorStyle.border}; cursor: pointer;"
+                  data-course-id="${course.course_id}"
+                  data-course-name="${course.course_name}"
+                  title="点击自定义颜色">
                 <div class="schedule-course">${course.course_name}</div>
                 <div class="schedule-room">${course.classroom}</div>
                 <div class="schedule-professor">${course.professor_name}</div>
@@ -323,14 +343,40 @@ async function loadMySchedule() {
 
       html += '</tbody></table>';
       container.innerHTML = html;
+      
+      container.querySelectorAll('.course-cell[data-course-id]').forEach(cell => {
+        cell.addEventListener('click', async () => {
+          const courseId = parseInt(cell.dataset.courseId);
+          const courseName = cell.dataset.courseName;
+          
+          console.log(`点击课程: ID=${courseId}, 名称="${courseName}"`);
+          
+          const currentIndex = CourseColorManager.getCurrentColorIndex(courseName, courseId);
+          console.log(`当前颜色索引: ${currentIndex}`);
+          
+          const result = await CourseColorManager.showColorPicker(courseName, currentIndex);
+          console.log(`选择结果:`, result);
+          
+          if (result === 'reset') {
+            CourseColorManager.resetColor(courseName);
+            UIToast.success('已重置为默认颜色');
+            await loadMySchedule();
+          } else if (result !== null) {
+            CourseColorManager.setColor(courseName, result);
+            UIToast.success('颜色设置成功');
+            await loadMySchedule();
+          }
+        });
+      });
     } else if (res.code === 200) {
-      container.innerHTML = '<p class="no-data">还没有选课，暂无课程表</p>';
+      container.innerHTML = '<p class="no-data">还没有选课，暂无课程表<br><small>请先到"可选课程"中选课</small></p>';
     } else {
-      container.innerHTML = '<p class="error-text">加载失败</p>';
+      console.error('课程表加载失败:', res);
+      container.innerHTML = `<p class="error-text">加载失败<br><small>错误代码: ${res.code}<br>错误信息: ${res.msg || '未知错误'}</small></p>`;
     }
   } catch (err) {
     console.error('加载课程表失败:', err);
-    container.innerHTML = '<p class="error-text">网络错误</p>';
+    container.innerHTML = `<p class="error-text">网络错误<br><small>请检查后端是否启动<br>错误详情: ${err.message || err}</small></p>`;
   }
 }
 
