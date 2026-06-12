@@ -1858,3 +1858,354 @@ body {
     font-size: 18px;
   }
 }
+
+.sorting-hat-trigger {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(145deg, rgba(244, 228, 193, 0.95) 0%, rgba(212, 196, 161, 0.98) 100%);
+  border: 3px solid var(--hogwarts-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: pointer;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(212, 175, 55, 0.3);
+  transition: all 0.3s ease;
+  z-index: 999;
+  animation: hatFloat 3s ease-in-out infinite;
+}
+
+.sorting-hat-trigger:hover {
+  transform: scale(1.15) rotate(10deg);
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(212, 175, 55, 0.5);
+}
+
+@keyframes hatFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.sorting-hat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+}
+
+.sorting-hat-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sorting-hat-content {
+  background: linear-gradient(145deg, rgba(244, 228, 193, 0.98) 0%, rgba(212, 196, 161, 0.98) 100%);
+  border: 4px solid var(--parchment-border);
+  border-radius: 20px;
+  padding: 40px 35px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    0 0 50px rgba(212, 175, 55, 0.3);
+  animation: hatModalIn 0.5s ease-out;
+}
+
+@keyframes hatModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.sorting-hat-icon {
+  text-align: center;
+  font-size: 80px;
+  margin-bottom: 15px;
+  animation: hatWiggle 2s ease-in-out infinite;
+}
+
+@keyframes hatWiggle {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+.sorting-hat-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ink-color);
+  letter-spacing: 4px;
+  margin-bottom: 5px;
+  text-shadow: 2px 2px 0 rgba(212, 175, 55, 0.3);
+}
+
+.sorting-hat-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-faded);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.sorting-hat-divider {
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--parchment-border) 20%, 
+    var(--hogwarts-gold) 50%, 
+    var(--parchment-border) 80%, 
+    transparent 100%);
+  margin: 0 auto 25px;
+  width: 80%;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.sorting-hat-message {
+  font-size: 18px;
+  color: var(--ink-color);
+  line-height: 1.8;
+  text-align: center;
+  margin-bottom: 30px;
+  min-height: 80px;
+  font-style: italic;
+  padding: 0 10px;
+}
+
+.sorting-hat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.sorting-hat-option {
+  padding: 15px 25px;
+  background: rgba(255, 250, 240, 0.6);
+  border: 2px solid var(--parchment-border);
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.sorting-hat-option:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.3);
+  border-color: var(--hogwarts-gold);
+  transform: translateX(10px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sorting-hat-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.sorting-hat-option.correct {
+  background: rgba(45, 90, 39, 0.3);
+  border-color: #2d5a27;
+  animation: correctPulse 0.5s ease;
+}
+
+@keyframes correctPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.sorting-hat-option.wrong {
+  background: rgba(139, 26, 43, 0.3);
+  border-color: #8b1a2b;
+  animation: wrongShake 0.5s ease;
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.sorting-hat-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.sorting-hat-btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 2px;
+}
+
+.sorting-hat-btn.close-btn {
+  background: rgba(184, 149, 110, 0.3);
+  color: var(--ink-color);
+  border: 2px solid var(--parchment-border);
+}
+
+.sorting-hat-btn.close-btn:hover {
+  background: rgba(184, 149, 110, 0.5);
+  transform: translateY(-2px);
+}
+
+.sorting-hat-btn.next-btn {
+  background: linear-gradient(135deg, var(--hogwarts-gold) 0%, #b8956e 100%);
+  color: var(--ink-color);
+}
+
+.sorting-hat-btn.next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.house-effect-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--house-bg);
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  overflow: hidden;
+}
+
+.house-effect-overlay.show {
+  opacity: 1;
+}
+
+.house-effect-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.effect-particle {
+  position: absolute;
+  animation: effectFloat 3s ease-out forwards;
+  opacity: 0;
+  filter: drop-shadow(0 0 10px var(--house-color));
+}
+
+@keyframes effectFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-200px) scale(1.5) rotate(360deg);
+  }
+}
+
+.house-effect-content {
+  text-align: center;
+  z-index: 1;
+  animation: contentFadeIn 0.8s ease-out;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.house-effect-icon {
+  font-size: 120px;
+  margin-bottom: 20px;
+  animation: iconPulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px var(--house-color));
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.house-effect-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--house-color);
+  letter-spacing: 6px;
+  margin-bottom: 20px;
+  text-shadow: 
+    0 0 20px var(--house-color),
+    0 0 40px var(--house-color);
+  animation: titleGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% { 
+    text-shadow: 
+      0 0 20px var(--house-color),
+      0 0 40px var(--house-color);
+  }
+  50% { 
+    text-shadow: 
+      0 0 30px var(--house-color),
+      0 0 60px var(--house-color),
+      0 0 80px var(--house-color);
+  }
+}
+
+.house-effect-message {
+  font-size: 28px;
+  color: var(--hogwarts-text);
+  letter-spacing: 3px;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.house-effect-quote {
+  font-size: 18px;
+  color: var(--hogwarts-text-muted);
+  font-style: italic;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
