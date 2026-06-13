@@ -234,3 +234,34 @@ async function getHouseCourseStats() {
     method: 'GET'
   });
 }
+
+async function getTimeTurnerStatus() {
+  return request('/student/time-turner/status', {
+    method: 'GET'
+  });
+}
+
+async function getAllActivities() {
+  return request('/student/activities', {
+    method: 'GET'
+  });
+}
+
+async function getMyActivities() {
+  return request('/student/my-activities', {
+    method: 'GET'
+  });
+}
+
+async function enrollActivity(data) {
+  return request('/student/activity/enroll', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function cancelActivityEnrollment(enrollmentId) {
+  return request(`/student/activity/enroll/${enrollmentId}`, {
+    method: 'DELETE'
+  });
+}

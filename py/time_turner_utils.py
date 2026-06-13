@@ -52,29 +52,19 @@ def check_student_has_time_turner(student_id):
     return is_top_house, student['house_name'], is_top_house
 
 
-def check_activity_time_conflict(student_id, activity_id):
+def check_time_slot_has_course(student_id, weekday, start_time, end_time):
     """
-    检查活动时间是否与学生已选课程冲突
-    注意：时间转换器允许在有课的时间参加活动，所以这里不检查冲突
-    但需要验证该时间段学生是否有课（必须有课才能使用时间转换器）
+    检查学生在指定时间段是否有课程
+    时间转换器要求：必须在有课的时间才能使用
 
     :param student_id: 学生ID
-    :param activity_id: 活动ID
-    :return: (has_course_conflict, conflict_info)
-             - has_course_conflict: 是否有课程（True表示有课，可以使用时间转换器）
-             - conflict_info: 冲突的课程信息
+    :param weekday: 星期 1-7
+    :param start_time: 开始时间
+    :param end_time: 结束时间
+    :return: (has_course, course_info)
+             - has_course: 是否有课（True表示有课，可以使用时间转换器）
+             - course_info: 课程信息
     """
-    # 获取活动时间
-    activity_sql = """
-        SELECT weekday, start_time, end_time, activity_name_cn
-        FROM activity
-        WHERE activity_id = %s AND status = 1
-    """
-    activity = execute_query(activity_sql, (activity_id,), fetch_one=True)
-
-    if not activity:
-        return False, "活动不存在或已禁用"
-
     # 获取学生在该时间段的课程
     course_sql = """
         SELECT c.course_name, cs.start_time, cs.end_time, cs.classroom
@@ -89,7 +79,7 @@ def check_activity_time_conflict(student_id, activity_id):
     """
     conflicting_courses = execute_query(
         course_sql,
-        (student_id, activity['weekday'], activity['end_time'], activity['start_time']),
+        (student_id, weekday, end_time, start_time),
         fetch_all=True
     )
 
@@ -100,20 +90,26 @@ def check_activity_time_conflict(student_id, activity_id):
         return False, None
 
 
-def check_activity_already_enrolled(student_id, activity_id):
+def check_activity_already_enrolled_at_time(student_id, weekday, start_time, end_time):
     """
-    检查学生是否已经选择了该活动
+    检查学生在指定时间段是否已经安排了活动
 
     :param student_id: 学生ID
-    :param activity_id: 活动ID
-    :return: 布尔值，True表示已选择
+    :param weekday: 星期 1-7
+    :param start_time: 开始时间
+    :param end_time: 结束时间
+    :return: 布尔值，True表示已安排
     """
     sql = """
         SELECT enrollment_id
         FROM student_activity_enrollment
-        WHERE student_id = %s AND activity_id = %s AND status = 1
+        WHERE student_id = %s 
+        AND weekday = %s 
+        AND start_time = %s 
+        AND end_time = %s 
+        AND status = 1
     """
-    result = execute_query(sql, (student_id, activity_id), fetch_one=True)
+    result = execute_query(sql, (student_id, weekday, start_time, end_time), fetch_one=True)
     return result is not None
 
 

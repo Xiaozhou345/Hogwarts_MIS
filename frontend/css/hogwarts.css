@@ -2209,3 +2209,310 @@ body {
   margin: 0 auto;
   line-height: 1.6;
 }
+
+.time-turner-trigger {
+  position: fixed;
+  bottom: 100px;
+  left: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.95) 0%, rgba(184, 149, 110, 0.98) 100%);
+  border: 3px solid var(--hogwarts-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: pointer;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(212, 175, 55, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  z-index: 998;
+  animation: timeTurnerGlow 2s ease-in-out infinite;
+}
+
+.time-turner-trigger:hover {
+  transform: scale(1.15) rotate(360deg);
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(212, 175, 55, 0.7);
+}
+
+@keyframes timeTurnerGlow {
+  0%, 100% { 
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(212, 175, 55, 0.5);
+  }
+  50% { 
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.4),
+      0 0 50px rgba(212, 175, 55, 0.8);
+  }
+}
+
+.time-turner-panel {
+  position: fixed;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 320px;
+  max-height: 80vh;
+  background: linear-gradient(145deg, rgba(244, 228, 193, 0.98) 0%, rgba(212, 196, 161, 0.98) 100%);
+  border: 3px solid var(--parchment-border);
+  border-radius: 16px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(212, 175, 55, 0.3);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.time-turner-panel.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.time-turner-header {
+  text-align: center;
+  margin-bottom: 15px;
+  cursor: move;
+}
+
+.time-turner-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+  animation: timeTurnerSpin 3s linear infinite;
+}
+
+@keyframes timeTurnerSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.time-turner-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink-color);
+  letter-spacing: 3px;
+}
+
+.time-turner-subtitle {
+  font-size: 12px;
+  color: var(--ink-faded);
+  letter-spacing: 1px;
+  margin-top: 5px;
+}
+
+.time-turner-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  background: rgba(139, 26, 43, 0.2);
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  color: var(--ink-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.time-turner-close:hover {
+  background: rgba(139, 26, 43, 0.4);
+  transform: rotate(90deg);
+}
+
+.time-turner-info {
+  margin-bottom: 15px;
+}
+
+.time-turner-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(212, 175, 55, 0.2) 100%);
+  border: 2px solid var(--hogwarts-gold);
+  border-radius: 8px;
+}
+
+.badge-icon {
+  font-size: 20px;
+}
+
+.badge-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-color);
+  letter-spacing: 1px;
+}
+
+.time-turner-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--hogwarts-gold) 50%, transparent 100%);
+  margin: 15px 0;
+}
+
+.time-turner-instruction {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+}
+
+.time-turner-instruction p {
+  margin: 5px 0;
+  font-size: 13px;
+  color: var(--ink-color);
+}
+
+.instruction-note {
+  font-size: 11px !important;
+  color: var(--ink-faded) !important;
+  font-style: italic;
+}
+
+.time-turner-activities {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.time-turner-activity {
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid var(--parchment-border);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: grab;
+  transition: all 0.3s ease;
+}
+
+.time-turner-activity:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--hogwarts-gold);
+  transform: translateX(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.time-turner-activity.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+.time-turner-activity.enrolled {
+  background: rgba(45, 90, 39, 0.15);
+  border-color: #2d5a27;
+  cursor: default;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.activity-icon {
+  font-size: 18px;
+}
+
+.activity-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-color);
+  flex: 1;
+}
+
+.enrolled-badge {
+  padding: 2px 8px;
+  background: #2d5a27;
+  color: white;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.activity-time, .activity-location, .activity-info, .activity-desc {
+  font-size: 12px;
+  color: var(--ink-faded);
+  margin: 4px 0;
+}
+
+.activity-desc {
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--parchment-border);
+}
+
+.schedule-table td.drop-highlight {
+  background: rgba(212, 175, 55, 0.4) !important;
+  border: 3px dashed var(--hogwarts-gold) !important;
+  animation: dropPulse 0.5s ease infinite;
+}
+
+@keyframes dropPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.schedule-table td.drop-reject {
+  background: rgba(139, 26, 43, 0.3) !important;
+  border: 3px dashed #8b1a2b !important;
+}
+
+.schedule-table td.drag-over {
+  background: rgba(212, 175, 55, 0.6) !important;
+  border: 3px solid var(--hogwarts-gold) !important;
+}
+
+.schedule-table td.split-cell {
+  padding: 0 !important;
+  vertical-align: top;
+}
+
+.split-cell-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.split-cell-top, .split-cell-bottom {
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 40px;
+}
+
+.split-cell-divider {
+  height: 2px;
+  background: var(--parchment-border);
+  margin: 0;
+}
+
+.split-course-name, .split-activity-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-color);
+  margin-bottom: 3px;
+}
+
+.split-detail {
+  font-size: 11px;
+  color: var(--ink-faded);
+}

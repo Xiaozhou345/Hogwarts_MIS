@@ -28,6 +28,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   await loadAvailableCourses();
   
+  // 初始化时间转换器（即使失败也不影响其他功能）
+  try {
+    await initTimeTurner();
+  } catch (err) {
+    console.error('时间转换器初始化失败:', err);
+  }
+  
   document.getElementById('closeDetailModalBtn').addEventListener('click', closeDetailModal);
   
   document.getElementById('backToHallBtn').addEventListener('click', () => {
@@ -311,31 +318,65 @@ async function loadMySchedule() {
         html += `<tr><td class="time-cell">${time}</td>`;
         const slotMinutes = timeToMinutes(time);
 
-        days.forEach(day => {
-          const courses = weekData[day] || [];
-          // 修复：使用数值比较而不是字符串比较
-          const course = courses.find(c => {
+        days.forEach((day, dayIndex) => {
+          const items = weekData[day] || [];
+          
+          const course = items.find(c => {
+            if (c.type !== 'course') return false;
             const startMinutes = timeToMinutes(c.start_time);
             const endMinutes = timeToMinutes(c.end_time);
             return slotMinutes >= startMinutes && slotMinutes < endMinutes;
           });
+          
+          const activity = items.find(a => {
+            if (a.type !== 'activity') return false;
+            const startMinutes = timeToMinutes(a.start_time);
+            const endMinutes = timeToMinutes(a.end_time);
+            return slotMinutes >= startMinutes && slotMinutes < endMinutes;
+          });
 
-          if (course) {
+          if (course && activity) {
             const colorStyle = getCourseColorStyle(course.course_id, course.course_name);
-            console.log(`应用颜色到课程 "${course.course_name}":`, JSON.stringify(colorStyle));
+            html += `
+              <td class="course-cell split-cell">
+                <div class="split-cell-container">
+                  <div class="split-cell-top" style="background: ${colorStyle.bg}; border-left: 3px solid ${colorStyle.border};">
+                    <div class="split-course-name">📚 ${course.course_name}</div>
+                    <div class="split-detail">${course.classroom}</div>
+                  </div>
+                  <div class="split-cell-divider"></div>
+                  <div class="split-cell-bottom" style="background: rgba(212, 175, 55, 0.2); border-left: 3px solid var(--hogwarts-gold);">
+                    <div class="split-activity-name">✨ ${activity.activity_name_cn}</div>
+                    <div class="split-detail">时间转换器</div>
+                  </div>
+                </div>
+              </td>
+            `;
+          } else if (course) {
+            const colorStyle = getCourseColorStyle(course.course_id, course.course_name);
             html += `
               <td class="course-cell" 
                   style="background: ${colorStyle.bg}; border-left: 4px solid ${colorStyle.border}; cursor: pointer;"
                   data-course-id="${course.course_id}"
                   data-course-name="${course.course_name}"
+                  data-weekday="${dayIndex + 1}"
+                  data-time="${time}"
                   title="点击自定义颜色">
                 <div class="schedule-course">${course.course_name}</div>
                 <div class="schedule-room">${course.classroom}</div>
                 <div class="schedule-professor">${course.professor_name}</div>
               </td>
             `;
+          } else if (activity) {
+            html += `
+              <td class="course-cell" style="background: rgba(212, 175, 55, 0.2); border-left: 4px solid var(--hogwarts-gold);">
+                <div class="schedule-course">✨ ${activity.activity_name_cn}</div>
+                <div class="schedule-room">${activity.location}</div>
+                <div class="schedule-professor">时间转换器</div>
+              </td>
+            `;
           } else {
-            html += '<td class="empty-cell"></td>';
+            html += `<td class="empty-cell" data-weekday="${dayIndex + 1}" data-time="${time}"></td>`;
           }
         });
         html += '</tr>';
@@ -368,6 +409,9 @@ async function loadMySchedule() {
           }
         });
       });
+      
+      // 触发课程表加载完成事件
+      window.dispatchEvent(new CustomEvent('scheduleLoaded'));
     } else if (res.code === 200) {
       container.innerHTML = '<p class="no-data">还没有选课，暂无课程表<br><small>请先到"可选课程"中选课</small></p>';
     } else {

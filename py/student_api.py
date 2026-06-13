@@ -6,8 +6,8 @@ from datetime import time
 from time_turner_utils import (
     check_student_has_time_turner,
     get_student_house_rank,
-    check_activity_time_conflict,
-    check_activity_already_enrolled
+    check_time_slot_has_course,
+    check_activity_already_enrolled_at_time
 )
 
 student_bp = Blueprint('student', __name__)
@@ -343,12 +343,12 @@ def get_my_schedule():
 
         # 2. 获取活动安排（时间转换器活动）
         activity_sql = """
-            SELECT a.activity_name, a.activity_name_cn, a.weekday,
-                   a.start_time, a.end_time, a.location
+            SELECT a.activity_name, a.activity_name_cn, sae.weekday,
+                   sae.start_time, sae.end_time, a.location
             FROM student_activity_enrollment sae
             JOIN activity a ON sae.activity_id = a.activity_id
             WHERE sae.student_id = %s AND sae.status = 1
-            ORDER BY a.weekday, a.start_time
+            ORDER BY sae.weekday, sae.start_time
         """
         activities = execute_query(activity_sql, (student_id,), fetch_all=True)
 
@@ -540,12 +540,9 @@ def get_all_activities():
                 "activity_id": 1,
                 "activity_name": "Tea with Hagrid",
                 "activity_name_cn": "去海格小屋喝茶",
-                "weekday": 1,
-                "start_time": "14:00:00",
-                "end_time": "15:30:00",
                 "location": "Hagrid's Hut",
                 "description": "...",
-                "is_enrolled": true/false
+                "suggested_duration": 90
             }
         ]
     }
@@ -562,40 +559,15 @@ def get_all_activities():
                 "data": None
             }), 403
 
-        # 获取所有启用的活动
+        # 获取所有启用的活动（不包含固定时间）
         sql = """
             SELECT activity_id, activity_name, activity_name_cn,
-                   weekday, start_time, end_time, location, description
+                   location, description, suggested_duration
             FROM activity
             WHERE status = 1
-            ORDER BY weekday, start_time
+            ORDER BY activity_id
         """
         activities = execute_query(sql, fetch_all=True)
-
-        # 查询学生已选择的活动
-        enrolled_sql = """
-            SELECT activity_id
-            FROM student_activity_enrollment
-            WHERE student_id = %s AND status = 1
-        """
-        enrolled_activities = execute_query(enrolled_sql, (student_id,), fetch_all=True)
-        enrolled_ids = {item['activity_id'] for item in enrolled_activities}
-
-        # 格式化数据
-        for activity in activities:
-            # 处理时间字段
-            for time_field in ['start_time', 'end_time']:
-                val = activity.get(time_field)
-                if val is not None:
-                    if hasattr(val, 'total_seconds'):  # timedelta
-                        activity[time_field] = str(val)
-                    elif hasattr(val, 'isoformat'):  # time
-                        activity[time_field] = val.isoformat()
-                    else:
-                        activity[time_field] = str(val)
-
-            # 标记是否已选择
-            activity['is_enrolled'] = activity['activity_id'] in enrolled_ids
 
         return jsonify({
             "code": 200,
@@ -622,9 +594,9 @@ def get_my_activities():
                 "activity_id": 1,
                 "activity_name": "Tea with Hagrid",
                 "activity_name_cn": "去海格小屋喝茶",
-                "weekday": 1,
-                "start_time": "14:00:00",
-                "end_time": "15:30:00",
+                "weekday": 2,
+                "start_time": "09:00:00",
+                "end_time": "09:50:00",
                 "location": "Hagrid's Hut",
                 "enrolled_at": "2024-01-01T10:00:00",
                 "status": 1
@@ -636,13 +608,13 @@ def get_my_activities():
         student_id = request.user_id
 
         sql = """
-            SELECT sae.enrollment_id, sae.activity_id, sae.enrolled_at, sae.status,
-                   a.activity_name, a.activity_name_cn, a.weekday,
-                   a.start_time, a.end_time, a.location, a.description
+            SELECT sae.enrollment_id, sae.activity_id, sae.weekday,
+                   sae.start_time, sae.end_time, sae.enrolled_at, sae.status,
+                   a.activity_name, a.activity_name_cn, a.location, a.description
             FROM student_activity_enrollment sae
             JOIN activity a ON sae.activity_id = a.activity_id
             WHERE sae.student_id = %s AND sae.status = 1
-            ORDER BY a.weekday, a.start_time
+            ORDER BY sae.weekday, sae.start_time
         """
         activities = execute_query(sql, (student_id,), fetch_all=True)
 
@@ -680,7 +652,10 @@ def enroll_activity():
     选择活动（使用时间转换器）
     请求体：
     {
-        "activity_id": 1
+        "activity_id": 1,
+        "weekday": 2,
+        "start_time": "09:00:00",
+        "end_time": "09:50:00"
     }
     返回格式：
     {
@@ -696,9 +671,17 @@ def enroll_activity():
         student_id = request.user_id
         data = request.get_json()
         activity_id = data.get('activity_id')
+        weekday = data.get('weekday')
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+        
+        print(f"[时间转换器] 接收到的参数: activity_id={activity_id}, weekday={weekday}, start_time={start_time}, end_time={end_time}")
 
+        # 验证必填参数
         if not activity_id:
             return jsonify({"code": 400, "msg": "缺少activity_id", "data": None}), 400
+        if not weekday or not start_time or not end_time:
+            return jsonify({"code": 400, "msg": "缺少时间参数（weekday, start_time, end_time）", "data": None}), 400
 
         # 1. 验证学生是否拥有时间转换器
         has_time_turner, house_name, _ = check_student_has_time_turner(student_id)
@@ -717,27 +700,32 @@ def enroll_activity():
         if not activity:
             return jsonify({"code": 404, "msg": "活动不存在或已禁用", "data": None}), 404
 
-        # 3. 检查是否已经选择该活动
-        if check_activity_already_enrolled(student_id, activity_id):
+        # 3. 检查该时间段是否已经有活动安排
+        if check_activity_already_enrolled_at_time(student_id, weekday, start_time, end_time):
             return jsonify({
                 "code": 400,
-                "msg": f"您已经选择了「{activity['activity_name_cn']}」活动",
+                "msg": f"该时间段已经安排了活动",
                 "data": None
             }), 400
 
-        # 4. 检查活动时间是否与课程重叠（时间转换器要求必须在有课时使用）
-        has_course, conflict_info = check_activity_time_conflict(student_id, activity_id)
+        # 4. 检查该时间段是否有课程（时间转换器要求必须在有课时使用）
+        has_course, course_info = check_time_slot_has_course(student_id, weekday, start_time, end_time)
         if not has_course:
             return jsonify({
                 "code": 400,
-                "msg": "时间转换器只能在有课程的时间使用，该活动时间段您没有课程安排",
+                "msg": "时间转换器只能在有课程的时间使用，该时间段您没有课程安排",
                 "data": None
             }), 400
 
-        # 5. 插入活动选课记录
+        # 5. 插入活动选课记录（包含学生安排的时间）
         enrollment_id = execute_query(
-            "INSERT INTO student_activity_enrollment (student_id, activity_id, status) VALUES (%s, %s, 1)",
-            (student_id, activity_id), commit=True, return_lastrowid=True
+            """
+            INSERT INTO student_activity_enrollment 
+            (student_id, activity_id, weekday, start_time, end_time, status) 
+            VALUES (%s, %s, %s, %s, %s, 1)
+            """,
+            (student_id, activity_id, weekday, start_time, end_time), 
+            commit=True, return_lastrowid=True
         )
 
         return jsonify({
