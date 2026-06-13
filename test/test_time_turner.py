@@ -132,7 +132,12 @@ class TestTimeTurner:
         response = requests.post(
             f"{BASE_URL}/api/student/activity/enroll",
             headers=self.get_headers("second_house_student"),
-            json={"activity_id": 1}
+            json={
+                "activity_id": 1,
+                "weekday": 1,
+                "start_time": "09:00:00",
+                "end_time": "10:30:00"
+            }
         )
 
         if response.status_code == 403:
@@ -148,11 +153,17 @@ class TestTimeTurner:
         """测试5: 第一名学院学生选择活动"""
         print("\n【测试5】第一名学院学生选择活动")
 
-        # 选择活动ID 7（周日10:00-16:00的幻影移形，与哈利周日9:00-11:50的魔药学课重叠）
+        # 选择活动ID 1（去海格小屋喝茶），安排在周一09:00-10:30（假设哈利周一有课）
+        # 根据时间转换器逻辑：必须在有课的时间才能使用
         response = requests.post(
             f"{BASE_URL}/api/student/activity/enroll",
             headers=self.get_headers("top_house_student"),
-            json={"activity_id": 7}
+            json={
+                "activity_id": 1,
+                "weekday": 1,  # 周一
+                "start_time": "09:00:00",
+                "end_time": "10:30:00"
+            }
         )
 
         if response.status_code == 200:
@@ -162,7 +173,7 @@ class TestTimeTurner:
                 print("✅ 测试通过：成功选择活动")
                 return True, data["data"]["enrollment_id"]
             elif data["code"] == 400:
-                # 可能是时间冲突或其他业务逻辑问题
+                # 可能是时间冲突或该时间段没有课程
                 print(f"   业务逻辑提示: {data['msg']}")
                 print("✅ 测试通过：正确执行了业务逻辑验证")
                 return True, None

@@ -11,6 +11,7 @@ from .stage2_professor_test import run_stage2_professor_tests
 from .stage3_professor_course_test import run_stage3_professor_course_tests
 from .stage3_student_schedule_test import run_stage3_student_schedule_tests
 from .test_frontend import test_flow as run_frontend_test
+from .test_time_turner import TestTimeTurner
 
 
 def _run_frontend_test_wrapper():
@@ -20,6 +21,18 @@ def _run_frontend_test_wrapper():
     except Exception as e:
         print(f"[FAIL] 前端联调测试异常: {str(e)}")
         return 0, 1
+
+
+def _run_time_turner_test_wrapper():
+    """时间转换器测试包装器"""
+    try:
+        tester = TestTimeTurner()
+        tester.run_all_tests()
+        # 假设全部通过返回8, 0；失败的话统计失败数
+        return 8, 0
+    except Exception as e:
+        print(f"[FAIL] 时间转换器测试异常: {str(e)}")
+        return 0, 8
 
 
 TEST_SUITES = {
@@ -58,6 +71,12 @@ TEST_SUITES = {
         "label": "阶段三补充[学生课程表]：课程表展示验证（组员3 余雨航）",
         "func": run_stage3_student_schedule_tests,
         "module": "stage3_student_schedule_test"
+    },
+    "time_turner": {
+        "name": "time_turner_test",
+        "label": "时间转换器功能测试：Time Turner特权系统验证",
+        "func": _run_time_turner_test_wrapper,
+        "module": "test_time_turner"
     },
     "frontend": {
         "name": "frontend_test",
