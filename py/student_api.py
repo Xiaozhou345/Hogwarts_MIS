@@ -718,16 +718,41 @@ def enroll_activity():
                 "data": None
             }), 400
 
-        # 5. 插入活动选课记录（包含学生安排的时间）
-        enrollment_id = execute_query(
+        # 5. 检查是否存在已取消的记录（status=0），如果存在则重新激活
+        existing_record = execute_query(
             """
-            INSERT INTO student_activity_enrollment 
-            (student_id, activity_id, weekday, start_time, end_time, status) 
-            VALUES (%s, %s, %s, %s, %s, 1)
+            SELECT enrollment_id
+            FROM student_activity_enrollment
+            WHERE student_id = %s AND weekday = %s
+              AND start_time = %s AND end_time = %s
             """,
-            (student_id, activity_id, weekday, start_time, end_time), 
-            commit=True, return_lastrowid=True
+            (student_id, weekday, start_time, end_time),
+            fetch_one=True
         )
+
+        if existing_record:
+            # 已存在记录（可能是之前取消的），更新为有效状态并更新activity_id
+            enrollment_id = existing_record['enrollment_id']
+            execute_query(
+                """
+                UPDATE student_activity_enrollment
+                SET activity_id = %s, status = 1, enrolled_at = CURRENT_TIMESTAMP
+                WHERE enrollment_id = %s
+                """,
+                (activity_id, enrollment_id),
+                commit=True
+            )
+        else:
+            # 不存在记录，插入新记录
+            enrollment_id = execute_query(
+                """
+                INSERT INTO student_activity_enrollment
+                (student_id, activity_id, weekday, start_time, end_time, status)
+                VALUES (%s, %s, %s, %s, %s, 1)
+                """,
+                (student_id, activity_id, weekday, start_time, end_time),
+                commit=True, return_lastrowid=True
+            )
 
         return jsonify({
             "code": 200,
