@@ -59,7 +59,7 @@ INSERT INTO activity (activity_name, activity_name_cn, location, description, su
 ('Apparition to Newt\'s Sanctuary', '幻影移形（去和纽特照顾神奇动物）', 'Newt Scamander\'s Sanctuary', '通过幻影移形前往纽特·斯卡曼德的神奇动物保护区，学习照顾神奇生物', 180, 1);
 
 -- ============================================
--- 创建触发器：当学院失去第一名时，自动删除该学院学生的活动选课
+-- 创建触发器：当学院积分变化时，删除所有非第一名学院学生的活动选课
 -- ============================================
 DELIMITER //
 
@@ -77,13 +77,14 @@ BEGIN
     ORDER BY total_points DESC
     LIMIT 1;
 
-    -- 如果被更新的学院不是当前第一名，则将该学院学生的活动选课状态设为0
-    IF OLD.house_id != current_top_house_id AND OLD.total_points >= NEW.total_points THEN
-        UPDATE student_activity_enrollment sae
-        JOIN sys_user u ON sae.student_id = u.user_id
-        SET sae.status = 0
-        WHERE u.house_id = OLD.house_id AND sae.status = 1;
-    END IF;
+    -- 删除所有非第一名学院学生的活动选课记录
+    -- 逻辑：只保留第一名学院的活动，其他学院的活动全部删除
+    -- 修改原因：
+    -- 1. 使用DELETE而不是UPDATE status=0，避免唯一键冲突
+    -- 2. 删除所有非第一名学院的活动，而不是只删除被更新学院的活动
+    DELETE sae FROM student_activity_enrollment sae
+    JOIN sys_user u ON sae.student_id = u.user_id
+    WHERE u.house_id != current_top_house_id AND sae.status = 1;
 END//
 
 DELIMITER ;
